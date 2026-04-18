@@ -516,27 +516,27 @@
       </h3>
       <div class="gold-row">
         <img id="materialBaseIcon" src="" alt="Base Material">
-        <label id="materialBaseLabel" for="materialBasePrice">Base material sell price per 1x</label>
+        <label id="materialBaseLabel" for="materialBasePrice">Base material sell price per 100x</label>
         <input type="number" id="materialBasePrice" placeholder="Gold">
       </div>
       <div class="gold-row">
         <img id="materialPowderIcon" src="" alt="Powder">
-        <label id="materialPowderLabel" for="materialPowderPrice">Powder sell price per 1x</label>
+        <label id="materialPowderLabel" for="materialPowderPrice">Powder sell price per 100x</label>
         <input type="number" id="materialPowderPrice" placeholder="Gold">
       </div>
       <div class="gold-row">
         <img id="materialTenderIcon" src="" alt="Tender Material">
-        <label id="materialTenderLabel" for="materialTenderPrice">Tender material sell price per 1x</label>
+        <label id="materialTenderLabel" for="materialTenderPrice">Tender material sell price per 100x</label>
         <input type="number" id="materialTenderPrice" placeholder="Gold">
       </div>
       <div class="gold-row" id="materialSturdyPriceRow">
         <img id="materialSturdyIcon" src="" alt="Sturdy Material">
-        <label id="materialSturdyLabel" for="materialSturdyPrice">Sturdy material sell price per 1x</label>
+        <label id="materialSturdyLabel" for="materialSturdyPrice">Sturdy material sell price per 100x</label>
         <input type="number" id="materialSturdyPrice" placeholder="Gold">
       </div>
       <div class="gold-row">
         <img id="materialAbidosIcon" src="" alt="Abidos Material">
-        <label id="materialAbidosLabel" for="materialAbidosPrice">Abidos material sell price per 1x</label>
+        <label id="materialAbidosLabel" for="materialAbidosPrice">Abidos material sell price per 100x</label>
         <input type="number" id="materialAbidosPrice" placeholder="Gold">
       </div>
     </div>
@@ -764,10 +764,10 @@
     }
 
     document.getElementById("materialSectionIcon").src = trade.icons.trade;
-    document.getElementById("materialBaseLabel").textContent = `${trade.base} sell price per 1x`;
-    document.getElementById("materialPowderLabel").textContent = `${trade.powder} sell price per 1x`;
-    document.getElementById("materialTenderLabel").textContent = `${trade.tender} sell price per 1x`;
-    document.getElementById("materialAbidosLabel").textContent = `${trade.abidos} sell price per 1x`;
+    document.getElementById("materialBaseLabel").textContent = `${trade.base} sell price per 100x`;
+    document.getElementById("materialPowderLabel").textContent = `${trade.powder} sell price per 100x`;
+    document.getElementById("materialTenderLabel").textContent = `${trade.tender} sell price per 100x`;
+    document.getElementById("materialAbidosLabel").textContent = `${trade.abidos} sell price per 100x`;
     document.getElementById("materialBaseIcon").src = trade.icons.base;
     document.getElementById("materialPowderIcon").src = trade.icons.powder;
     document.getElementById("materialTenderIcon").src = trade.icons.tender;
@@ -776,7 +776,7 @@
     const materialSturdyRow = document.getElementById("materialSturdyPriceRow");
     if (trade.useSturdy && trade.sturdy && trade.icons.sturdy) {
       materialSturdyRow.style.display = "flex";
-      document.getElementById("materialSturdyLabel").textContent = `${trade.sturdy} sell price per 1x`;
+      document.getElementById("materialSturdyLabel").textContent = `${trade.sturdy} sell price per 100x`;
       document.getElementById("materialSturdyIcon").src = trade.icons.sturdy;
     } else {
       materialSturdyRow.style.display = "none";
@@ -1016,11 +1016,11 @@
     const craftedSaleValue = data.fusionMaterial * sellPricePerOne;
     const netCraftedValue = craftedSaleValue - totalCraftingCost;
     const rawMaterialSaleValue =
-      (base * materialBasePrice) +
-      (powder * materialPowderPrice) +
-      (tender * materialTenderPrice) +
-      (sturdy * materialSturdyPrice) +
-      (abidos * materialAbidosPrice);
+      ((base / 100) * materialBasePrice) +
+      ((powder / 100) * materialPowderPrice) +
+      ((tender / 100) * materialTenderPrice) +
+      ((sturdy / 100) * materialSturdyPrice) +
+      ((abidos / 100) * materialAbidosPrice);
 
     let stepZero = "";
     if (trade.useSturdy && data.sturdyToBaseTimes > 0) {
