@@ -786,13 +786,11 @@
     const materialPowderLabel = document.getElementById("materialPowderLabel");
     const materialPowderPrice = document.getElementById("materialPowderPrice");
     if (trade.powderTradeable === false) {
-      materialPowderRow.style.opacity = "0.6";
-      materialPowderLabel.textContent = `${trade.powder} is not tradeable`;
+      materialPowderRow.style.display = "none";
       materialPowderPrice.value = "";
-      materialPowderPrice.placeholder = "Not tradeable";
       materialPowderPrice.disabled = true;
     } else {
-      materialPowderRow.style.opacity = "1";
+      materialPowderRow.style.display = "flex";
       materialPowderLabel.textContent = `${trade.powder} sell price per 100x`;
       materialPowderPrice.placeholder = "Gold";
       materialPowderPrice.disabled = false;
