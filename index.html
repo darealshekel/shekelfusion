@@ -519,7 +519,7 @@
         <label id="materialBaseLabel" for="materialBasePrice">Base material sell price per 100x</label>
         <input type="number" id="materialBasePrice" placeholder="Gold">
       </div>
-      <div class="gold-row">
+      <div class="gold-row" id="materialPowderPriceRow">
         <img id="materialPowderIcon" src="" alt="Powder">
         <label id="materialPowderLabel" for="materialPowderPrice">Powder sell price per 100x</label>
         <input type="number" id="materialPowderPrice" placeholder="Gold">
@@ -603,6 +603,7 @@
       label: "Logging",
       base: "Timber",
       powder: "Logging Powder",
+      powderTradeable: false,
       tender: "Tender Timber",
       sturdy: "Sturdy Timber",
       useSturdy: true,
@@ -620,6 +621,7 @@
       label: "Foraging",
       base: "Wild Flower",
       powder: "Gathering Powder",
+      powderTradeable: true,
       tender: "Shy Wild Flower",
       sturdy: null,
       useSturdy: false,
@@ -637,6 +639,7 @@
       label: "Mining",
       base: "Iron Ore",
       powder: "Mining Powder",
+      powderTradeable: true,
       tender: "Heavy Iron Ore",
       sturdy: "Strong Iron Ore",
       useSturdy: true,
@@ -654,6 +657,7 @@
       label: "Hunting",
       base: "Thick Raw Meat",
       powder: "Hunting Powder",
+      powderTradeable: true,
       tender: "Treated Meat",
       sturdy: null,
       useSturdy: false,
@@ -671,6 +675,7 @@
       label: "Fishing",
       base: "Fish",
       powder: "Fishing Powder",
+      powderTradeable: true,
       tender: "Redflesh Fish",
       sturdy: null,
       useSturdy: false,
@@ -688,6 +693,7 @@
       label: "Excavating",
       base: "Ancient Relic",
       powder: "Excavating Powder",
+      powderTradeable: true,
       tender: "Rare Relic",
       sturdy: null,
       useSturdy: false,
@@ -769,13 +775,28 @@
 
     document.getElementById("materialSectionIcon").src = trade.icons.trade;
     document.getElementById("materialBaseLabel").textContent = `${trade.base} sell price per 100x`;
-    document.getElementById("materialPowderLabel").textContent = `${trade.powder} sell price per 100x`;
     document.getElementById("materialTenderLabel").textContent = `${trade.tender} sell price per 100x`;
     document.getElementById("materialAbidosLabel").textContent = `${trade.abidos} sell price per 100x`;
     document.getElementById("materialBaseIcon").src = trade.icons.base;
     document.getElementById("materialPowderIcon").src = trade.icons.powder;
     document.getElementById("materialTenderIcon").src = trade.icons.tender;
     document.getElementById("materialAbidosIcon").src = trade.icons.abidos;
+
+    const materialPowderRow = document.getElementById("materialPowderPriceRow");
+    const materialPowderLabel = document.getElementById("materialPowderLabel");
+    const materialPowderPrice = document.getElementById("materialPowderPrice");
+    if (trade.powderTradeable === false) {
+      materialPowderRow.style.opacity = "0.6";
+      materialPowderLabel.textContent = `${trade.powder} is not tradeable`;
+      materialPowderPrice.value = "";
+      materialPowderPrice.placeholder = "Not tradeable";
+      materialPowderPrice.disabled = true;
+    } else {
+      materialPowderRow.style.opacity = "1";
+      materialPowderLabel.textContent = `${trade.powder} sell price per 100x`;
+      materialPowderPrice.placeholder = "Gold";
+      materialPowderPrice.disabled = false;
+    }
 
     const materialSturdyRow = document.getElementById("materialSturdyPriceRow");
     if (trade.useSturdy && trade.sturdy && trade.icons.sturdy) {
@@ -957,7 +978,7 @@
     const allPrices = getStoredMaterialPrices();
     allPrices[currentTrade] = {
       base: document.getElementById("materialBasePrice").value || "0",
-      powder: document.getElementById("materialPowderPrice").value || "0",
+      powder: trades[currentTrade].powderTradeable === false ? "0" : (document.getElementById("materialPowderPrice").value || "0"),
       tender: document.getElementById("materialTenderPrice").value || "0",
       sturdy: document.getElementById("materialSturdyPrice").value || "0",
       abidos: document.getElementById("materialAbidosPrice").value || "0"
@@ -967,8 +988,11 @@
 
   function loadMaterialPricesForTrade() {
     const tradePrices = getStoredMaterialPrices()[currentTrade] || {};
+    const powderPriceInput = document.getElementById("materialPowderPrice");
     document.getElementById("materialBasePrice").value = tradePrices.base && tradePrices.base !== "0" ? tradePrices.base : "";
-    document.getElementById("materialPowderPrice").value = tradePrices.powder && tradePrices.powder !== "0" ? tradePrices.powder : "";
+    powderPriceInput.value = trades[currentTrade].powderTradeable === false
+      ? ""
+      : (tradePrices.powder && tradePrices.powder !== "0" ? tradePrices.powder : "");
     document.getElementById("materialTenderPrice").value = tradePrices.tender && tradePrices.tender !== "0" ? tradePrices.tender : "";
     document.getElementById("materialAbidosPrice").value = tradePrices.abidos && tradePrices.abidos !== "0" ? tradePrices.abidos : "";
     document.getElementById("materialSturdyPrice").value = tradePrices.sturdy && tradePrices.sturdy !== "0" ? tradePrices.sturdy : "";
@@ -1081,7 +1105,7 @@
     const netCraftedValue = craftedSaleValue - totalCraftingCost;
     const rawMaterialSaleValue =
       ((base / 100) * materialBasePrice) +
-      ((powder / 100) * materialPowderPrice) +
+      ((powder / 100) * (trade.powderTradeable === false ? 0 : materialPowderPrice)) +
       ((tender / 100) * materialTenderPrice) +
       ((sturdy / 100) * materialSturdyPrice) +
       ((abidos / 100) * materialAbidosPrice);
