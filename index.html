@@ -440,6 +440,18 @@
     color: var(--gold);
   }
 
+  .comparison-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent-text);
+  }
+
+  .comparison-sub {
+    margin-top: 6px;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
   @media (max-width: 700px) {
     body { padding: 16px; }
     .input-row { flex-wrap: wrap; }
@@ -496,6 +508,38 @@
         <input type="number" id="saleAdvanced" placeholder="Gold">
       </div>
     </div>
+
+    <div class="panel-section">
+      <h3>
+        <img id="materialSectionIcon" src="" alt="Materials">
+        Material Sell Price Settings
+      </h3>
+      <div class="gold-row">
+        <img id="materialBaseIcon" src="" alt="Base Material">
+        <label id="materialBaseLabel" for="materialBasePrice">Base material sell price per 1x</label>
+        <input type="number" id="materialBasePrice" placeholder="Gold">
+      </div>
+      <div class="gold-row">
+        <img id="materialPowderIcon" src="" alt="Powder">
+        <label id="materialPowderLabel" for="materialPowderPrice">Powder sell price per 1x</label>
+        <input type="number" id="materialPowderPrice" placeholder="Gold">
+      </div>
+      <div class="gold-row">
+        <img id="materialTenderIcon" src="" alt="Tender Material">
+        <label id="materialTenderLabel" for="materialTenderPrice">Tender material sell price per 1x</label>
+        <input type="number" id="materialTenderPrice" placeholder="Gold">
+      </div>
+      <div class="gold-row" id="materialSturdyPriceRow">
+        <img id="materialSturdyIcon" src="" alt="Sturdy Material">
+        <label id="materialSturdyLabel" for="materialSturdyPrice">Sturdy material sell price per 1x</label>
+        <input type="number" id="materialSturdyPrice" placeholder="Gold">
+      </div>
+      <div class="gold-row">
+        <img id="materialAbidosIcon" src="" alt="Abidos Material">
+        <label id="materialAbidosLabel" for="materialAbidosPrice">Abidos material sell price per 1x</label>
+        <input type="number" id="materialAbidosPrice" placeholder="Gold">
+      </div>
+    </div>
   </div>
 
   <div class="glass">
@@ -550,6 +594,7 @@
   const ICON_NORMAL = "https://lostarkcodex.com/icons/use_12_86.webp";
   const ICON_ADVANCED = "https://i.postimg.cc/hP8pjg4N/Use-13-252.png";
   const GOLD_ICON = "https://lostarkcodex.com/icons/use_11_215.webp";
+  const MATERIAL_PRICE_STORAGE_KEY = "materialPricesByTrade";
 
   const trades = {
     logging: {
@@ -717,6 +762,28 @@
       sturdyRow.style.display = "none";
       document.getElementById("sturdyInput").value = "";
     }
+
+    document.getElementById("materialSectionIcon").src = trade.icons.trade;
+    document.getElementById("materialBaseLabel").textContent = `${trade.base} sell price per 1x`;
+    document.getElementById("materialPowderLabel").textContent = `${trade.powder} sell price per 1x`;
+    document.getElementById("materialTenderLabel").textContent = `${trade.tender} sell price per 1x`;
+    document.getElementById("materialAbidosLabel").textContent = `${trade.abidos} sell price per 1x`;
+    document.getElementById("materialBaseIcon").src = trade.icons.base;
+    document.getElementById("materialPowderIcon").src = trade.icons.powder;
+    document.getElementById("materialTenderIcon").src = trade.icons.tender;
+    document.getElementById("materialAbidosIcon").src = trade.icons.abidos;
+
+    const materialSturdyRow = document.getElementById("materialSturdyPriceRow");
+    if (trade.useSturdy && trade.sturdy && trade.icons.sturdy) {
+      materialSturdyRow.style.display = "flex";
+      document.getElementById("materialSturdyLabel").textContent = `${trade.sturdy} sell price per 1x`;
+      document.getElementById("materialSturdyIcon").src = trade.icons.sturdy;
+    } else {
+      materialSturdyRow.style.display = "none";
+      document.getElementById("materialSturdyPrice").value = "";
+    }
+
+    loadMaterialPricesForTrade();
   }
 
   function setupModeButtons() {
@@ -867,11 +934,41 @@
     };
   }
 
+  function getStoredMaterialPrices() {
+    try {
+      return JSON.parse(localStorage.getItem(MATERIAL_PRICE_STORAGE_KEY) || "{}");
+    } catch {
+      return {};
+    }
+  }
+
+  function saveMaterialPricesForTrade() {
+    const allPrices = getStoredMaterialPrices();
+    allPrices[currentTrade] = {
+      base: document.getElementById("materialBasePrice").value || "0",
+      powder: document.getElementById("materialPowderPrice").value || "0",
+      tender: document.getElementById("materialTenderPrice").value || "0",
+      sturdy: document.getElementById("materialSturdyPrice").value || "0",
+      abidos: document.getElementById("materialAbidosPrice").value || "0"
+    };
+    localStorage.setItem(MATERIAL_PRICE_STORAGE_KEY, JSON.stringify(allPrices));
+  }
+
+  function loadMaterialPricesForTrade() {
+    const tradePrices = getStoredMaterialPrices()[currentTrade] || {};
+    document.getElementById("materialBasePrice").value = tradePrices.base && tradePrices.base !== "0" ? tradePrices.base : "";
+    document.getElementById("materialPowderPrice").value = tradePrices.powder && tradePrices.powder !== "0" ? tradePrices.powder : "";
+    document.getElementById("materialTenderPrice").value = tradePrices.tender && tradePrices.tender !== "0" ? tradePrices.tender : "";
+    document.getElementById("materialAbidosPrice").value = tradePrices.abidos && tradePrices.abidos !== "0" ? tradePrices.abidos : "";
+    document.getElementById("materialSturdyPrice").value = tradePrices.sturdy && tradePrices.sturdy !== "0" ? tradePrices.sturdy : "";
+  }
+
   function saveGold() {
     localStorage.setItem("goldNormal", document.getElementById("goldNormal").value || "0");
     localStorage.setItem("goldAdvanced", document.getElementById("goldAdvanced").value || "0");
     localStorage.setItem("saleNormal", document.getElementById("saleNormal").value || "0");
     localStorage.setItem("saleAdvanced", document.getElementById("saleAdvanced").value || "0");
+    saveMaterialPricesForTrade();
   }
 
   function loadGold() {
@@ -910,6 +1007,20 @@
     const saleNormal = parseFloat(document.getElementById("saleNormal").value) || 0;
     const saleAdvanced = parseFloat(document.getElementById("saleAdvanced").value) || 0;
     const sellPricePerOne = advanced ? saleAdvanced : saleNormal;
+    const materialBasePrice = parseFloat(document.getElementById("materialBasePrice").value) || 0;
+    const materialPowderPrice = parseFloat(document.getElementById("materialPowderPrice").value) || 0;
+    const materialTenderPrice = parseFloat(document.getElementById("materialTenderPrice").value) || 0;
+    const materialSturdyPrice = parseFloat(document.getElementById("materialSturdyPrice").value) || 0;
+    const materialAbidosPrice = parseFloat(document.getElementById("materialAbidosPrice").value) || 0;
+    const totalCraftingCost = workingActions * costPer10;
+    const craftedSaleValue = data.fusionMaterial * sellPricePerOne;
+    const netCraftedValue = craftedSaleValue - totalCraftingCost;
+    const rawMaterialSaleValue =
+      (base * materialBasePrice) +
+      (powder * materialPowderPrice) +
+      (tender * materialTenderPrice) +
+      (sturdy * materialSturdyPrice) +
+      (abidos * materialAbidosPrice);
 
     let stepZero = "";
     if (trade.useSturdy && data.sturdyToBaseTimes > 0) {
@@ -939,7 +1050,7 @@
             <img src="${GOLD_ICON}" alt="Gold">
             Estimated Total Crafting Cost
           </div>
-          <div class="gold-total-value">${(workingActions * costPer10).toLocaleString()} Gold</div>
+          <div class="gold-total-value">${totalCraftingCost.toLocaleString()} Gold</div>
         </div>
       `
       : "";
@@ -951,10 +1062,60 @@
             <img src="${fusionIcon}" alt="Sell Value">
             Estimated Total Sale Value
           </div>
-          <div class="gold-total-value">${(data.fusionMaterial * sellPricePerOne).toLocaleString()} Gold</div>
+          <div class="gold-total-value">${craftedSaleValue.toLocaleString()} Gold</div>
         </div>
       `
       : "";
+
+    const netCraftHtml = craftedSaleValue > 0
+      ? `
+        <div class="gold-total-box">
+          <div class="gold-total-title">
+            <img src="${fusionIcon}" alt="Net Craft Value">
+            Estimated Net Craft Value
+          </div>
+          <div class="gold-total-value">${netCraftedValue.toLocaleString()} Gold</div>
+        </div>
+      `
+      : "";
+
+    const rawMaterialHtml = rawMaterialSaleValue > 0
+      ? `
+        <div class="gold-total-box">
+          <div class="gold-total-title">
+            <img src="${trade.icons.trade}" alt="Raw Material Value">
+            Estimated Raw Material Sale Value
+          </div>
+          <div class="gold-total-value">${rawMaterialSaleValue.toLocaleString()} Gold</div>
+        </div>
+      `
+      : "";
+
+    let comparisonHtml = "";
+    if (craftedSaleValue > 0 && rawMaterialSaleValue > 0) {
+      const difference = netCraftedValue - rawMaterialSaleValue;
+      const betterOption = difference > 0
+        ? "Craft Abidos"
+        : difference < 0
+          ? "Sell Raw Mats"
+          : "Either Option";
+      const summary = difference > 0
+        ? `Crafting is ahead by ${Math.abs(difference).toLocaleString()} Gold`
+        : difference < 0
+          ? `Selling mats is ahead by ${Math.abs(difference).toLocaleString()} Gold`
+          : "Both options are equal in value";
+
+      comparisonHtml = `
+        <div class="gold-total-box">
+          <div class="gold-total-title">
+            <img src="${difference >= 0 ? fusionIcon : trade.icons.trade}" alt="Better Option">
+            Better Option
+          </div>
+          <div class="comparison-value">${betterOption}</div>
+          <div class="comparison-sub">${summary}</div>
+        </div>
+      `;
+    }
 
     const output = document.getElementById("output");
     output.style.display = "block";
@@ -1012,6 +1173,9 @@
       </div>
       ${goldHtml}
       ${saleHtml}
+      ${netCraftHtml}
+      ${rawMaterialHtml}
+      ${comparisonHtml}
     `;
   }
 
@@ -1021,6 +1185,11 @@
   document.getElementById("goldAdvanced").addEventListener("input", saveGold);
   document.getElementById("saleNormal").addEventListener("input", saveGold);
   document.getElementById("saleAdvanced").addEventListener("input", saveGold);
+  document.getElementById("materialBasePrice").addEventListener("input", saveGold);
+  document.getElementById("materialPowderPrice").addEventListener("input", saveGold);
+  document.getElementById("materialTenderPrice").addEventListener("input", saveGold);
+  document.getElementById("materialSturdyPrice").addEventListener("input", saveGold);
+  document.getElementById("materialAbidosPrice").addEventListener("input", saveGold);
 
   createParticles();
   renderTradeButtons();
