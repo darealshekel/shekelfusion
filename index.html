@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fusion Material Calculator</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-a: #111827;
+    --bg-b: #1f2937;
+    --bg-c: #000000;
+    --panel: rgba(255, 255, 255, 0.05);
+    --panel-border: rgba(255, 255, 255, 0.08);
+    --text: #ffffff;
+    --text-soft: #d1d5db;
+    --text-muted: #9ca3af;
+    --text-faint: #6b7280;
+    --accent: rgba(80, 140, 120, 0.85);
+    --accent-hover: rgba(80, 140, 120, 0.65);
+    --accent-text: #8abba8;
+    --gold: #d4a44a;
+    --warning: #b05050;
+  }
+
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(to bottom right, var(--bg-a), var(--bg-b), var(--bg-c));
+    min-height: 100vh;
+    color: var(--text);
+    padding: 20px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  .particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: rgba(130, 180, 160, 0.15);
+    border-radius: 50%;
+    animation: float-up linear infinite;
+  }
+
+  @keyframes float-up {
+    0% { transform: translateY(0) scale(1); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
+  }
+
+  @keyframes result-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes result-slide-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes result-scale {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .container {
+    max-width: 900px;
+    margin: auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header-area {
+    position: relative;
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .byline {
+    color: #4b5563;
+    font-size: 13px;
+  }
+
+  .gold-menu-btn,
+  .trade-btn,
+  .mode-btn,
+  .calculate {
+    transition: all 0.2s;
+  }
+
+  .gold-menu-btn {
+    position: absolute;
+    top: 4px;
+    right: 0;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  .gold-menu-btn:hover,
+  .trade-btn:hover,
+  .mode-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-soft);
+  }
+
+  .gold-menu-btn img {
+    width: 22px;
+    height: 22px;
+  }
+
+  .glass,
+  .gold-panel,
+  .step-box,
+  .gold-total-box {
+    background: var(--panel);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+  }
+
+  .gold-panel {
+    display: none;
+    padding: 16px;
+    margin-bottom: 20px;
+    animation: result-slide-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .gold-panel.open {
+    display: block;
+  }
+
+  .gold-panel h3 {
+    font-size: 15px;
+    color: var(--text-soft);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gold-panel h3 img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .panel-section {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .glass {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .trade-buttons,
+  .mode-toggle {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .trade-btn,
+  .mode-btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: none;
+    background: var(--panel);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    outline: none;
+  }
+
+  .trade-btn img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .mode-btn img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .trade-btn.active,
+  .mode-btn.active,
+  .calculate {
+    background: var(--accent);
+    color: var(--text);
+  }
+
+  .trade-btn.active:hover,
+  .mode-btn.active:hover,
+  .calculate:hover {
+    background: var(--accent-hover);
+  }
+
+  .inputs-wrapper {
+    margin-top: 10px;
+  }
+
+  .input-row,
+  .gold-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .input-row {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .input-row img {
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+  }
+
+  .gold-row img {
+    width: 26px;
+    height: 26px;
+  }
+
+  .input-row label {
+    min-width: 150px;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-right: 8px;
+  }
+
+  .gold-row label {
+    font-size: 13px;
+    color: var(--text-muted);
+    min-width: 200px;
+  }
+
+  .input-row input,
+  .gold-row input {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #e5e7eb;
+    outline: none;
+    transition: border 0.2s;
+  }
+
+  .input-row input {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .gold-row input {
+    width: 120px;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .input-row input:focus,
+  .gold-row input:focus {
+    border-color: rgba(80, 140, 120, 0.4);
+  }
+
+  .input-row input::placeholder,
+  .gold-row input::placeholder {
+    color: #4b5563;
+  }
+
+  .calculate {
+    width: 100%;
+    padding: 12px;
+    margin-top: 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  #output {
+    margin-top: 24px;
+    display: none;
+  }
+
+  #output .mode-label {
+    animation: result-fade 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .mode-label {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .mode-label span {
+    color: var(--accent-text);
+    font-weight: 600;
+  }
+
+  .step-box {
+    padding: 18px;
+    margin-top: 16px;
+    animation: result-slide-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .step-title {
+    font-size: 17px;
+    color: var(--accent-text);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+  }
+
+  .step-title span {
+    font-size: 13px;
+    color: var(--text-faint);
+    font-weight: 400;
+  }
+
+  .step-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .step-row img {
+    width: 28px;
+    height: 28px;
+    margin-right: 8px;
+  }
+
+  .step-text {
+    font-size: 14px;
+    color: var(--text-soft);
+  }
+
+  .fusion-final {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--accent-text);
+    text-align: center;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    animation: result-scale 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+  }
+
+  .fusion-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .fusion-sub {
+    text-align: center;
+    color: var(--text-faint);
+    margin-top: 4px;
+    font-size: 13px;
+  }
+
+  .hint-warning {
+    text-align: center;
+    color: var(--warning);
+    font-size: 15px;
+    margin-top: 8px;
+    opacity: 0.85;
+  }
+
+  .gold-total-box {
+    padding: 16px;
+    margin-top: 16px;
+    text-align: center;
+    animation: result-slide-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+  }
+
+  .gold-total-title {
+    font-size: 15px;
+    color: var(--text-soft);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .gold-total-title img {
+    width: 22px;
+    height: 22px;
+  }
+
+  .gold-total-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  @media (max-width: 700px) {
+    body { padding: 16px; }
+    .input-row { flex-wrap: wrap; }
+    .input-row label { margin-bottom: 6px; min-width: auto; }
+    .gold-menu-btn { position: static; margin: 10px auto 0; }
+    .gold-row { flex-wrap: wrap; }
+    .gold-row label { min-width: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="particles" id="particles"></div>
+
+<div class="container">
+  <div class="header-area">
+    <h1>Fusion Material Calculator</h1>
+    <p class="subtitle">This calculator uses standard Trade Skill materials, which can be exchanged and processed inside your Stronghold.</p>
+    <p class="byline">Local editable clone of fusion.amnx.de</p>
+    <button class="gold-menu-btn" id="goldMenuBtn" type="button">
+      <img src="https://lostarkcodex.com/icons/use_11_215.webp" alt="Gold">
+      Gold Cost
+    </button>
+  </div>
+
+  <div class="gold-panel" id="goldPanel">
+    <h3>
+      <img src="https://lostarkcodex.com/icons/use_11_215.webp" alt="Gold">
+      Crafting Cost Settings
+    </h3>
+    <div class="gold-row">
+      <img src="https://lostarkcodex.com/icons/use_12_86.webp" alt="Fusion">
+      <label for="goldNormal">Cost per 10x Abidos Fusion Material</label>
+      <input type="number" id="goldNormal" placeholder="Gold">
+    </div>
+    <div class="gold-row">
+      <img src="https://i.postimg.cc/hP8pjg4N/Use-13-252.png" alt="Advanced Fusion">
+      <label for="goldAdvanced">Cost per 10x Advanced Abidos Fusion Material</label>
+      <input type="number" id="goldAdvanced" placeholder="Gold">
+    </div>
+
+    <div class="panel-section">
+      <h3>
+        <img src="https://lostarkcodex.com/icons/use_12_86.webp" alt="Sell Value">
+        Sell Price Settings
+      </h3>
+      <div class="gold-row">
+        <img src="https://lostarkcodex.com/icons/use_12_86.webp" alt="Fusion">
+        <label for="saleNormal">Sell price per 1x Abidos Fusion Material</label>
+        <input type="number" id="saleNormal" placeholder="Gold">
+      </div>
+      <div class="gold-row">
+        <img src="https://i.postimg.cc/hP8pjg4N/Use-13-252.png" alt="Advanced Fusion">
+        <label for="saleAdvanced">Sell price per 1x Advanced Abidos Fusion Material</label>
+        <input type="number" id="saleAdvanced" placeholder="Gold">
+      </div>
+    </div>
+  </div>
+
+  <div class="glass">
+    <div class="trade-buttons" id="tradeButtons"></div>
+
+    <div class="mode-toggle">
+      <button class="mode-btn active" type="button" data-mode="normal">
+        <img src="https://lostarkcodex.com/icons/use_12_86.webp" alt="Fusion">
+        Abidos Fusion Material
+      </button>
+      <button class="mode-btn" type="button" data-mode="advanced">
+        <img src="https://i.postimg.cc/hP8pjg4N/Use-13-252.png" alt="Advanced Fusion">
+        Advanced Abidos Fusion Material
+      </button>
+    </div>
+
+    <div id="inputsWrapper" class="inputs-wrapper">
+      <div class="input-row">
+        <img id="iconBase" src="" alt="Base">
+        <label id="labelBase" for="baseInput">Base</label>
+        <input type="number" id="baseInput" placeholder="Enter amount">
+      </div>
+      <div class="input-row">
+        <img id="iconPowder" src="" alt="Powder">
+        <label id="labelPowder" for="powderInput">Powder</label>
+        <input type="number" id="powderInput" placeholder="Enter amount">
+      </div>
+      <div class="input-row">
+        <img id="iconTender" src="" alt="Tender">
+        <label id="labelTender" for="tenderInput">Tender</label>
+        <input type="number" id="tenderInput" placeholder="Enter amount">
+      </div>
+      <div class="input-row" id="sturdyRow">
+        <img id="iconSturdy" src="" alt="Sturdy">
+        <label id="labelSturdy" for="sturdyInput">Sturdy</label>
+        <input type="number" id="sturdyInput" placeholder="Enter amount">
+      </div>
+      <div class="input-row">
+        <img id="iconAbidos" src="" alt="Abidos">
+        <label id="labelAbidos" for="abidosInput">Abidos</label>
+        <input type="number" id="abidosInput" placeholder="Enter amount">
+      </div>
+    </div>
+
+    <button class="calculate" id="calculateBtn" type="button">Calculate</button>
+  </div>
+
+  <div id="output"></div>
+</div>
+
+<script>
+  const ICON_NORMAL = "https://lostarkcodex.com/icons/use_12_86.webp";
+  const ICON_ADVANCED = "https://i.postimg.cc/hP8pjg4N/Use-13-252.png";
+  const GOLD_ICON = "https://lostarkcodex.com/icons/use_11_215.webp";
+
+  const trades = {
+    logging: {
+      label: "Logging",
+      base: "Timber",
+      powder: "Logging Powder",
+      tender: "Tender Timber",
+      sturdy: "Sturdy Timber",
+      useSturdy: true,
+      abidos: "Abidos Timber",
+      icons: {
+        base: "https://lostarkcodex.com/icons/use_3_252.webp",
+        powder: "https://lostarkcodex.com/icons/use_10_37.webp",
+        tender: "https://lostarkcodex.com/icons/use_3_253.webp",
+        sturdy: "https://lostarkcodex.com/icons/use_4_4.webp",
+        abidos: "https://lostarkcodex.com/icons/lifelevel_02_48.webp",
+        trade: "https://lostarkcodex.com/icons/lifelevel_01_123.webp"
+      }
+    },
+    foraging: {
+      label: "Foraging",
+      base: "Wild Flower",
+      powder: "Gathering Powder",
+      tender: "Shy Wild Flower",
+      sturdy: null,
+      useSturdy: false,
+      abidos: "Abidos Wild Flower",
+      icons: {
+        base: "https://lostarkcodex.com/icons/use_8_46.webp",
+        powder: "https://lostarkcodex.com/icons/use_10_38.webp",
+        tender: "https://lostarkcodex.com/icons/use_4_14.webp",
+        sturdy: null,
+        abidos: "https://lostarkcodex.com/icons/lifelevel_02_47.webp",
+        trade: "https://lostarkcodex.com/icons/lifelevel_01_118.webp"
+      }
+    },
+    mining: {
+      label: "Mining",
+      base: "Iron Ore",
+      powder: "Mining Powder",
+      tender: "Heavy Iron Ore",
+      sturdy: "Strong Iron Ore",
+      useSturdy: true,
+      abidos: "Abidos Iron Ore",
+      icons: {
+        base: "https://lostarkcodex.com/icons/use_3_243.webp",
+        powder: "https://lostarkcodex.com/icons/use_10_36.webp",
+        tender: "https://lostarkcodex.com/icons/use_3_239.webp",
+        sturdy: "https://lostarkcodex.com/icons/use_5_76.webp",
+        abidos: "https://lostarkcodex.com/icons/lifelevel_02_49.webp",
+        trade: "https://lostarkcodex.com/icons/lifelevel_01_133.webp"
+      }
+    },
+    hunting: {
+      label: "Hunting",
+      base: "Thick Raw Meat",
+      powder: "Hunting Powder",
+      tender: "Treated Meat",
+      sturdy: null,
+      useSturdy: false,
+      abidos: "Abidos Thick Raw Meat",
+      icons: {
+        base: "https://lostarkcodex.com/icons/use_2_192.webp",
+        powder: "https://lostarkcodex.com/icons/use_10_39.webp",
+        tender: "https://lostarkcodex.com/icons/use_2_196.webp",
+        sturdy: null,
+        abidos: "https://lostarkcodex.com/icons/lifelevel_02_51.webp",
+        trade: "https://lostarkcodex.com/icons/lifelevel_01_143.webp"
+      }
+    },
+    fishing: {
+      label: "Fishing",
+      base: "Fish",
+      powder: "Fishing Powder",
+      tender: "Redflesh Fish",
+      sturdy: null,
+      useSturdy: false,
+      abidos: "Abidos Solar Carp",
+      icons: {
+        base: "https://lostarkcodex.com/icons/use_1_142.webp",
+        powder: "https://lostarkcodex.com/icons/use_10_35.webp",
+        tender: "https://lostarkcodex.com/icons/use_4_49.webp",
+        sturdy: null,
+        abidos: "https://lostarkcodex.com/icons/lifelevel_02_53.webp",
+        trade: "https://lostarkcodex.com/icons/lifelevel_01_136.webp"
+      }
+    },
+    excavating: {
+      label: "Excavating",
+      base: "Ancient Relic",
+      powder: "Excavating Powder",
+      tender: "Rare Relic",
+      sturdy: null,
+      useSturdy: false,
+      abidos: "Abidos Relic",
+      icons: {
+        base: "https://lostarkcodex.com/icons/use_9_3.webp",
+        powder: "https://lostarkcodex.com/icons/use_10_40.webp",
+        tender: "https://lostarkcodex.com/icons/use_9_4.webp",
+        sturdy: null,
+        abidos: "https://lostarkcodex.com/icons/lifelevel_02_55.webp",
+        trade: "https://lostarkcodex.com/icons/lifelevel_01_148.webp"
+      }
+    }
+  };
+
+  let currentTrade = "logging";
+  let currentMode = "normal";
+
+  function createParticles() {
+    const container = document.getElementById("particles");
+    for (let i = 0; i < 30; i += 1) {
+      const particle = document.createElement("div");
+      const size = 2 + Math.random() * 2;
+      particle.className = "particle";
+      particle.style.left = `${Math.random() * 100}%`;
+      particle.style.top = `${Math.random() * 100}%`;
+      particle.style.animationDelay = `${Math.random() * 20}s`;
+      particle.style.animationDuration = `${15 + Math.random() * 10}s`;
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      container.appendChild(particle);
+    }
+  }
+
+  function toggleGoldPanel() {
+    document.getElementById("goldPanel").classList.toggle("open");
+  }
+
+  function renderTradeButtons() {
+    const wrapper = document.getElementById("tradeButtons");
+    wrapper.innerHTML = Object.entries(trades).map(([key, trade]) => `
+      <button class="trade-btn${key === currentTrade ? " active" : ""}" type="button" data-trade="${key}">
+        <img src="${trade.icons.trade}" alt="${trade.label}">
+        ${trade.label}
+      </button>
+    `).join("");
+
+    wrapper.querySelectorAll(".trade-btn").forEach((button) => {
+      button.addEventListener("click", () => {
+        currentTrade = button.dataset.trade;
+        renderTradeButtons();
+        updateTradeUI();
+      });
+    });
+  }
+
+  function updateTradeUI() {
+    const trade = trades[currentTrade];
+    document.getElementById("labelBase").textContent = trade.base;
+    document.getElementById("labelPowder").textContent = trade.powder;
+    document.getElementById("labelTender").textContent = trade.tender;
+    document.getElementById("labelAbidos").textContent = trade.abidos;
+    document.getElementById("iconBase").src = trade.icons.base;
+    document.getElementById("iconPowder").src = trade.icons.powder;
+    document.getElementById("iconTender").src = trade.icons.tender;
+    document.getElementById("iconAbidos").src = trade.icons.abidos;
+
+    const sturdyRow = document.getElementById("sturdyRow");
+    if (trade.useSturdy && trade.sturdy && trade.icons.sturdy) {
+      sturdyRow.style.display = "flex";
+      document.getElementById("labelSturdy").textContent = trade.sturdy;
+      document.getElementById("iconSturdy").src = trade.icons.sturdy;
+    } else {
+      sturdyRow.style.display = "none";
+      document.getElementById("sturdyInput").value = "";
+    }
+  }
+
+  function setupModeButtons() {
+    document.querySelectorAll(".mode-btn").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".mode-btn").forEach((other) => other.classList.remove("active"));
+        button.classList.add("active");
+        currentMode = button.dataset.mode;
+      });
+    });
+  }
+
+  function calculate(base, powder, tender, sturdy, abidos, advanced, useSturdy) {
+    let fusionMaterial = 0;
+    let sturdyToBase = 0;
+    let sturdyToBaseTimes = 0;
+    let baseToPowder = 0;
+    let baseToPowderTimes = 0;
+    let tenderToPowder = 0;
+    let tenderToPowderTimes = 0;
+    let powderToBase = 0;
+    let powderToBaseTimes = 0;
+    let powderToTender = 0;
+    let powderToTenderTimes = 0;
+    let powderToAbidos = 0;
+    let powderToAbidosTimes = 0;
+    let cycles = 0;
+    let totalPowderGenerated = 0;
+    const startingPowder = powder;
+    let totalPowderAvailable = startingPowder;
+
+    const requirements = advanced
+      ? { abidos: 43, tender: 59, base: 112, modeLabel: "Advanced Abidos Fusion Material" }
+      : { abidos: 33, tender: 45, base: 86, modeLabel: "Abidos Fusion Material" };
+
+    function canCraft() {
+      return abidos >= requirements.abidos && tender >= requirements.tender && base >= requirements.base;
+    }
+
+    function shortages() {
+      const needed = [];
+      if (abidos < requirements.abidos) needed.push("abidos");
+      if (tender < requirements.tender) needed.push("tender");
+      if (base < requirements.base) needed.push("base");
+      return needed;
+    }
+
+    if (useSturdy) {
+      while (sturdy >= 5) {
+        sturdy -= 5;
+        base += 50;
+        sturdyToBase += 50;
+        sturdyToBaseTimes += 1;
+      }
+    }
+
+    let changed = true;
+    while (changed) {
+      changed = false;
+      cycles += 1;
+
+      while (canCraft()) {
+        abidos -= requirements.abidos;
+        tender -= requirements.tender;
+        base -= requirements.base;
+        fusionMaterial += 10;
+        changed = true;
+      }
+
+      const missing = shortages();
+      if (missing.length === 0) {
+        break;
+      }
+
+      if (powder >= 100) {
+        if (missing.includes("abidos")) {
+          powder -= 100;
+          abidos += 10;
+          powderToAbidos += 100;
+          powderToAbidosTimes += 1;
+          changed = true;
+          continue;
+        }
+        if (missing.includes("tender")) {
+          powder -= 100;
+          tender += 50;
+          powderToTender += 100;
+          powderToTenderTimes += 1;
+          changed = true;
+          continue;
+        }
+        if (missing.includes("base")) {
+          powder -= 100;
+          base += 50;
+          powderToBase += 100;
+          powderToBaseTimes += 1;
+          changed = true;
+          continue;
+        }
+      }
+
+      if (tender >= 50 || base >= 100) {
+        if (base >= tender && base >= 100) {
+          base -= 100;
+          powder += 80;
+          totalPowderGenerated += 80;
+          totalPowderAvailable += 80;
+          baseToPowder += 100;
+          baseToPowderTimes += 1;
+          changed = true;
+          continue;
+        }
+        if (tender >= 50) {
+          tender -= 50;
+          powder += 80;
+          totalPowderGenerated += 80;
+          totalPowderAvailable += 80;
+          tenderToPowder += 50;
+          tenderToPowderTimes += 1;
+          changed = true;
+        }
+      }
+    }
+
+    return {
+      modeLabel: requirements.modeLabel,
+      cycles,
+      sturdyToBase,
+      sturdyToBaseTimes,
+      baseToPowder,
+      baseToPowderTimes,
+      tenderToPowder,
+      tenderToPowderTimes,
+      powderToBase,
+      powderToBaseTimes,
+      powderToTender,
+      powderToTenderTimes,
+      powderToAbidos,
+      powderToAbidosTimes,
+      totalPowderGenerated,
+      totalPowderAvailable,
+      fusionMaterial,
+      abidos,
+      tender,
+      base,
+      powder,
+      sturdy
+    };
+  }
+
+  function saveGold() {
+    localStorage.setItem("goldNormal", document.getElementById("goldNormal").value || "0");
+    localStorage.setItem("goldAdvanced", document.getElementById("goldAdvanced").value || "0");
+    localStorage.setItem("saleNormal", document.getElementById("saleNormal").value || "0");
+    localStorage.setItem("saleAdvanced", document.getElementById("saleAdvanced").value || "0");
+  }
+
+  function loadGold() {
+    const goldNormal = localStorage.getItem("goldNormal");
+    const goldAdvanced = localStorage.getItem("goldAdvanced");
+    const saleNormal = localStorage.getItem("saleNormal");
+    const saleAdvanced = localStorage.getItem("saleAdvanced");
+    if (goldNormal && goldNormal !== "0") {
+      document.getElementById("goldNormal").value = goldNormal;
+    }
+    if (goldAdvanced && goldAdvanced !== "0") {
+      document.getElementById("goldAdvanced").value = goldAdvanced;
+    }
+    if (saleNormal && saleNormal !== "0") {
+      document.getElementById("saleNormal").value = saleNormal;
+    }
+    if (saleAdvanced && saleAdvanced !== "0") {
+      document.getElementById("saleAdvanced").value = saleAdvanced;
+    }
+  }
+
+  function runCalc() {
+    const trade = trades[currentTrade];
+    const base = parseInt(document.getElementById("baseInput").value || "0", 10);
+    const powder = parseInt(document.getElementById("powderInput").value || "0", 10);
+    const tender = parseInt(document.getElementById("tenderInput").value || "0", 10);
+    const sturdy = trade.useSturdy ? parseInt(document.getElementById("sturdyInput").value || "0", 10) : 0;
+    const abidos = parseInt(document.getElementById("abidosInput").value || "0", 10);
+    const advanced = currentMode === "advanced";
+    const data = calculate(base, powder, tender, sturdy, abidos, advanced, trade.useSturdy);
+    const fusionIcon = advanced ? ICON_ADVANCED : ICON_NORMAL;
+    const workingActions = data.fusionMaterial / 10;
+    const goldNormal = parseFloat(document.getElementById("goldNormal").value) || 0;
+    const goldAdvanced = parseFloat(document.getElementById("goldAdvanced").value) || 0;
+    const costPer10 = advanced ? goldAdvanced : goldNormal;
+    const saleNormal = parseFloat(document.getElementById("saleNormal").value) || 0;
+    const saleAdvanced = parseFloat(document.getElementById("saleAdvanced").value) || 0;
+    const sellPricePerOne = advanced ? saleAdvanced : saleNormal;
+
+    let stepZero = "";
+    if (trade.useSturdy && data.sturdyToBaseTimes > 0) {
+      stepZero = `
+        <div class="step-box">
+          <div class="step-title">Step 0 - ${trade.sturdy} Conversion <span>(Converting sturdy material into base material)</span></div>
+          <div class="step-row">
+            <img src="${trade.icons.sturdy}" alt="${trade.sturdy}">
+            <div class="step-text">5x ${trade.sturdy} -> 50 ${trade.base}</div>
+          </div>
+          <div class="step-row">
+            <img src="${trade.icons.sturdy}" alt="${trade.sturdy}">
+            <div class="step-text">Repeated <strong style="color: var(--accent-text)">${data.sturdyToBaseTimes} times</strong> -> Total gained: <strong style="color: var(--accent-text)">${data.sturdyToBase}</strong> ${trade.base}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    const hintHtml = data.fusionMaterial > 2400
+      ? `<div class="hint-warning">Recommendation: With this amount, consider crafting Fusion Material directly first before converting to Powder.</div>`
+      : "";
+
+    const goldHtml = costPer10 > 0 && data.fusionMaterial > 0
+      ? `
+        <div class="gold-total-box">
+          <div class="gold-total-title">
+            <img src="${GOLD_ICON}" alt="Gold">
+            Estimated Total Crafting Cost
+          </div>
+          <div class="gold-total-value">${(workingActions * costPer10).toLocaleString()} Gold</div>
+        </div>
+      `
+      : "";
+
+    const saleHtml = sellPricePerOne > 0 && data.fusionMaterial > 0
+      ? `
+        <div class="gold-total-box">
+          <div class="gold-total-title">
+            <img src="${fusionIcon}" alt="Sell Value">
+            Estimated Total Sale Value
+          </div>
+          <div class="gold-total-value">${(data.fusionMaterial * sellPricePerOne).toLocaleString()} Gold</div>
+        </div>
+      `
+      : "";
+
+    const output = document.getElementById("output");
+    output.style.display = "block";
+    output.innerHTML = `
+      <div class="mode-label">Trade skill: <span>${trade.label}</span> • Mode: <span>${data.modeLabel}</span> • Cycles: <span>${data.cycles}</span></div>
+      ${stepZero}
+      <div class="step-box">
+        <div class="step-title">Step 1 - ${trade.base} / ${trade.tender} -> ${trade.powder} <span>(Generating powder from basic materials)</span></div>
+        ${data.baseToPowderTimes > 0 ? `
+          <div class="step-row">
+            <img src="${trade.icons.base}" alt="${trade.base}">
+            <div class="step-text"><strong style="color: var(--accent-text)">${data.baseToPowderTimes}x</strong> 100 ${trade.base} -> 80 ${trade.powder}</div>
+          </div>
+        ` : ""}
+        ${data.tenderToPowderTimes > 0 ? `
+          <div class="step-row">
+            <img src="${trade.icons.tender}" alt="${trade.tender}">
+            <div class="step-text"><strong style="color: var(--accent-text)">${data.tenderToPowderTimes}x</strong> 50 ${trade.tender} -> 80 ${trade.powder}</div>
+          </div>
+        ` : ""}
+        <div class="step-row">
+          <img src="${trade.icons.powder}" alt="${trade.powder}">
+          <div class="step-text">Total ${trade.powder} available: ${data.totalPowderAvailable}</div>
+        </div>
+      </div>
+      <div class="step-box">
+        <div class="step-title">Step 2 - ${trade.powder} -> ${trade.abidos} / ${trade.tender} / ${trade.base} <span>(Converting powder back into materials)</span></div>
+        ${data.powderToAbidosTimes > 0 ? `
+          <div class="step-row">
+            <img src="${trade.icons.abidos}" alt="${trade.abidos}">
+            <div class="step-text"><strong style="color: var(--accent-text)">${data.powderToAbidosTimes}x</strong> 100 ${trade.powder} -> 10 ${trade.abidos}</div>
+          </div>
+        ` : ""}
+        ${data.powderToTenderTimes > 0 ? `
+          <div class="step-row">
+            <img src="${trade.icons.tender}" alt="${trade.tender}">
+            <div class="step-text"><strong style="color: var(--accent-text)">${data.powderToTenderTimes}x</strong> 100 ${trade.powder} -> 50 ${trade.tender}</div>
+          </div>
+        ` : ""}
+        ${data.powderToBaseTimes > 0 ? `
+          <div class="step-row">
+            <img src="${trade.icons.base}" alt="${trade.base}">
+            <div class="step-text"><strong style="color: var(--accent-text)">${data.powderToBaseTimes}x</strong> 100 ${trade.powder} -> 50 ${trade.base}</div>
+          </div>
+        ` : ""}
+      </div>
+      <div class="step-box">
+        <div class="step-title">Step 3 - Fusion Material <span>(Final result after all conversions)</span></div>
+        <div class="fusion-final">
+          <img class="fusion-icon" src="${fusionIcon}" alt="Fusion Material">
+          ${data.fusionMaterial} x ${data.modeLabel}
+        </div>
+        <div class="fusion-sub">(${workingActions} working actions)</div>
+        ${hintHtml}
+      </div>
+      ${goldHtml}
+      ${saleHtml}
+    `;
+  }
+
+  document.getElementById("goldMenuBtn").addEventListener("click", toggleGoldPanel);
+  document.getElementById("calculateBtn").addEventListener("click", runCalc);
+  document.getElementById("goldNormal").addEventListener("input", saveGold);
+  document.getElementById("goldAdvanced").addEventListener("input", saveGold);
+  document.getElementById("saleNormal").addEventListener("input", saveGold);
+  document.getElementById("saleAdvanced").addEventListener("input", saveGold);
+
+  createParticles();
+  renderTradeButtons();
+  setupModeButtons();
+  updateTradeUI();
+  loadGold();
+</script>
+</body>
+</html>
