@@ -1,6 +1,6 @@
-# Fusion AMNX Editable Clone
+# ShekelFusion
 
-This folder contains a local standalone clone of the calculator at `https://fusion.amnx.de/` so you can edit the UI and logic directly.
+This folder contains the local standalone `ShekelFusion` site, based on the calculator at `https://fusion.amnx.de/`, so you can edit the UI and logic directly.
 
 Important:
 
