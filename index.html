@@ -5,33 +5,73 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ShekelFusion</title>
 <style>
+  @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg-a: #111827;
-    --bg-b: #1f2937;
-    --bg-c: #000000;
-    --panel: rgba(255, 255, 255, 0.05);
-    --panel-border: rgba(255, 255, 255, 0.08);
-    --text: #ffffff;
-    --text-soft: #d1d5db;
-    --text-muted: #9ca3af;
-    --text-faint: #6b7280;
-    --accent: rgba(80, 140, 120, 0.85);
-    --accent-hover: rgba(80, 140, 120, 0.65);
-    --accent-text: #8abba8;
-    --gold: #d4a44a;
-    --warning: #b05050;
+    --bg: #12100d;
+    --bg-deep: #181511;
+    --panel: #f2eadc;
+    --panel-strong: #eadfce;
+    --panel-border: rgba(60, 46, 29, 0.14);
+    --panel-shadow: 0 28px 80px rgba(0, 0, 0, 0.24);
+    --text: #1f1a14;
+    --text-soft: #352d24;
+    --text-muted: #6f6559;
+    --text-faint: #968a7c;
+    --accent: #221d17;
+    --accent-hover: #302922;
+    --accent-surface: #d8c6ab;
+    --accent-text: #7a5626;
+    --gold: #ad7528;
+    --warning: #9f5343;
+    --focus: rgba(122, 86, 38, 0.24);
+    --radius-lg: 28px;
+    --radius-md: 18px;
+    --radius-sm: 12px;
   }
 
   body {
-    font-family: "Segoe UI", Arial, sans-serif;
-    background: linear-gradient(to bottom right, var(--bg-a), var(--bg-b), var(--bg-c));
+    font-family: "Manrope", Arial, sans-serif;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(169, 128, 64, 0.14), transparent 34%),
+      radial-gradient(circle at 82% 18%, rgba(95, 72, 42, 0.18), transparent 30%),
+      linear-gradient(180deg, #171410 0%, #13110e 42%, #0f0d0a 100%);
     min-height: 100vh;
     color: var(--text);
-    padding: 20px;
+    padding: 24px;
     position: relative;
     overflow-x: hidden;
+  }
+
+  body::before,
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::before {
+    background:
+      radial-gradient(circle at 18% 22%, rgba(255, 237, 204, 0.06), transparent 24%),
+      radial-gradient(circle at 76% 14%, rgba(201, 160, 103, 0.08), transparent 22%),
+      linear-gradient(140deg, transparent 0%, rgba(255, 255, 255, 0.02) 46%, transparent 100%);
+    animation: atmosphere-drift 24s ease-in-out infinite alternate;
+  }
+
+  body::after {
+    background:
+      repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.012) 0,
+        rgba(255, 255, 255, 0.012) 1px,
+        transparent 1px,
+        transparent 96px
+      );
+    opacity: 0.35;
   }
 
   .particles {
@@ -40,22 +80,28 @@
     pointer-events: none;
     z-index: 0;
     overflow: hidden;
+    opacity: 0.55;
   }
 
   .particle {
     position: absolute;
-    width: 3px;
-    height: 3px;
-    background: rgba(130, 180, 160, 0.15);
+    width: 2px;
+    height: 2px;
+    background: rgba(250, 240, 221, 0.24);
     border-radius: 50%;
-    animation: float-up linear infinite;
+    animation: mote-drift linear infinite;
   }
 
-  @keyframes float-up {
-    0% { transform: translateY(0) scale(1); opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
+  @keyframes atmosphere-drift {
+    from { transform: translate3d(-1.5%, -1%, 0) scale(1); opacity: 0.68; }
+    to { transform: translate3d(1.5%, 1%, 0) scale(1.05); opacity: 1; }
+  }
+
+  @keyframes mote-drift {
+    0% { transform: translate3d(0, 20px, 0); opacity: 0; }
+    15% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { transform: translate3d(0, -120px, 0); opacity: 0; }
   }
 
   @keyframes result-fade {
@@ -64,109 +110,160 @@
   }
 
   @keyframes result-slide-up {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(18px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes result-scale {
-    from { opacity: 0; transform: scale(0.9); }
+    from { opacity: 0; transform: scale(0.96); }
     to { opacity: 1; transform: scale(1); }
   }
 
   .container {
-    max-width: 900px;
-    margin: auto;
+    max-width: 1160px;
+    margin: 0 auto;
     position: relative;
     z-index: 1;
   }
 
   .header-area {
-    position: relative;
-    text-align: center;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
+    animation: result-slide-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .header-main {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 28px;
+  }
+
+  .header-copy {
+    max-width: 760px;
+  }
+
+  .eyebrow {
+    margin-bottom: 14px;
+    color: rgba(244, 231, 213, 0.72);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
   }
 
   h1 {
-    font-size: 1.875rem;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: clamp(3.35rem, 7vw, 5.9rem);
+    line-height: 0.92;
     font-weight: 700;
-    margin-bottom: 8px;
+    letter-spacing: -0.04em;
+    color: #f7efdf;
+    margin-bottom: 14px;
   }
 
   .subtitle {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin-bottom: 8px;
+    max-width: 640px;
+    color: rgba(244, 231, 213, 0.78);
+    font-size: 15px;
+    line-height: 1.7;
   }
 
   .byline {
-    color: #4b5563;
-    font-size: 13px;
+    margin-top: 12px;
+    color: rgba(244, 231, 213, 0.48);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
   }
 
   .gold-menu-btn,
   .trade-btn,
   .mode-btn,
   .calculate {
-    transition: all 0.2s;
+    transition:
+      transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 180ms ease,
+      color 180ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease;
   }
 
   .gold-menu-btn {
-    position: absolute;
-    top: 4px;
-    right: 0;
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 8px;
-    padding: 6px 10px;
+    align-self: flex-start;
+    background: rgba(245, 234, 220, 0.06);
+    border: 1px solid rgba(245, 234, 220, 0.16);
+    border-radius: 999px;
+    padding: 12px 16px;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
-    color: var(--text-muted);
+    gap: 10px;
+    color: rgba(247, 239, 223, 0.78);
     font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
 
   .gold-menu-btn:hover,
   .trade-btn:hover,
-  .mode-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-soft);
+  .mode-btn:hover,
+  .calculate:hover {
+    transform: translateY(-1px);
+  }
+
+  .gold-menu-btn:hover {
+    background: rgba(245, 234, 220, 0.1);
+    color: #fff8eb;
+    border-color: rgba(245, 234, 220, 0.24);
+  }
+
+  .gold-menu-btn:active,
+  .trade-btn:active,
+  .mode-btn:active,
+  .calculate:active {
+    transform: translateY(0);
   }
 
   .gold-menu-btn img {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
   }
 
   .glass,
   .gold-panel,
   .step-box,
   .gold-total-box {
-    background: var(--panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--panel-border);
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--panel-shadow);
   }
 
   .gold-panel {
     display: none;
-    padding: 16px;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
+    padding: 26px 28px;
+    background: linear-gradient(180deg, rgba(238, 226, 208, 0.98) 0%, rgba(231, 218, 200, 0.98) 100%);
     animation: result-slide-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+    gap: 18px;
   }
 
   .gold-panel.open {
-    display: block;
+    display: grid;
   }
 
   .gold-panel h3 {
-    font-size: 15px;
+    font-size: 12px;
     color: var(--text-soft);
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 800;
   }
 
   .gold-panel h3 img {
@@ -175,39 +272,233 @@
   }
 
   .panel-section {
-    margin-top: 16px;
-    padding-top: 14px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    margin-top: 2px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(60, 46, 29, 0.1);
+  }
+
+  .market-sync-section {
+    display: grid;
+    gap: 14px;
+  }
+
+  .market-sync-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .market-sync-head h3 {
+    margin-bottom: 0;
+  }
+
+  .market-sync-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(60, 46, 29, 0.12);
+    background: rgba(255, 251, 245, 0.74);
+    color: var(--text-faint);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .market-sync-pill.success {
+    color: #fff8ec;
+    background: rgba(122, 86, 38, 0.92);
+    border-color: rgba(122, 86, 38, 0.92);
+  }
+
+  .market-sync-pill.warn {
+    color: #fff6ea;
+    background: rgba(159, 83, 67, 0.9);
+    border-color: rgba(159, 83, 67, 0.9);
+  }
+
+  .market-sync-copy,
+  .market-sync-status,
+  .market-sync-meta {
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .market-sync-status {
+    color: var(--text-soft);
+    font-weight: 700;
+  }
+
+  .market-sync-controls {
+    display: flex;
+    align-items: end;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .market-sync-field {
+    display: grid;
+    gap: 8px;
+    min-width: 124px;
+  }
+
+  .market-sync-field span {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .market-sync-field select,
+  .market-fetch-btn {
+    min-height: 44px;
+    border-radius: 14px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    outline: none;
+    transition:
+      transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 180ms ease,
+      background-color 180ms ease,
+      color 180ms ease,
+      box-shadow 180ms ease;
+  }
+
+  .market-sync-field select {
+    min-width: 124px;
+    padding: 0 14px;
+    border: 1px solid rgba(60, 46, 29, 0.12);
+    background: rgba(255, 252, 247, 0.94);
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  .market-sync-field select:hover {
+    border-color: rgba(60, 46, 29, 0.2);
+  }
+
+  .market-sync-field select:focus-visible,
+  .market-fetch-btn:focus-visible {
+    box-shadow: 0 0 0 4px var(--focus);
+  }
+
+  .market-fetch-btn {
+    padding: 0 18px;
+    border: 1px solid rgba(34, 29, 23, 0.9);
+    background: var(--accent);
+    color: #f6efe2;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .market-fetch-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    background: var(--accent-hover);
+  }
+
+  .market-fetch-btn:disabled {
+    opacity: 0.72;
+    cursor: wait;
+    transform: none;
+  }
+
+  .gold-row {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) 138px;
+    gap: 14px;
+    align-items: center;
+    padding: 13px 0;
+    border-top: 1px solid rgba(60, 46, 29, 0.08);
+  }
+
+  .gold-panel > .gold-row {
+    border-top: 0;
+  }
+
+  .panel-section .gold-row:first-of-type {
+    border-top: 0;
+  }
+
+  .gold-row img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .gold-row label {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.45;
   }
 
   .glass {
+    padding: 28px;
+    margin-bottom: 18px;
+    background:
+      linear-gradient(180deg, rgba(245, 237, 224, 0.98) 0%, rgba(240, 232, 220, 0.98) 100%);
+    animation: result-slide-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .builder-top {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: 18px;
+    margin-bottom: 22px;
+  }
+
+  .builder-block {
     padding: 20px;
-    margin-bottom: 20px;
+    border-radius: 22px;
+    border: 1px solid rgba(60, 46, 29, 0.08);
+    background: rgba(255, 250, 243, 0.42);
+  }
+
+  .section-label {
+    margin-bottom: 14px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
   }
 
   .trade-buttons,
   .mode-toggle {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
-    margin-bottom: 20px;
+    gap: 10px;
   }
 
   .trade-btn,
   .mode-btn {
-    padding: 6px 14px;
-    border-radius: 6px;
-    border: none;
-    background: var(--panel);
+    min-height: 46px;
+    padding: 10px 15px;
+    border-radius: 14px;
+    border: 1px solid rgba(60, 46, 29, 0.1);
+    background: rgba(255, 255, 255, 0.52);
     color: var(--text-muted);
     cursor: pointer;
     font-size: 13px;
-    font-weight: 500;
-    display: flex;
+    font-weight: 700;
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     outline: none;
+  }
+
+  .trade-btn:hover,
+  .mode-btn:hover {
+    color: var(--text-soft);
+    border-color: rgba(60, 46, 29, 0.18);
+    background: rgba(255, 255, 255, 0.76);
   }
 
   .trade-btn img {
@@ -221,212 +512,271 @@
   }
 
   .trade-btn.active,
-  .mode-btn.active,
-  .calculate {
+  .mode-btn.active {
     background: var(--accent);
-    color: var(--text);
+    border-color: rgba(34, 29, 23, 0.9);
+    color: #f6efe2;
+    box-shadow: 0 16px 32px rgba(34, 29, 23, 0.16);
   }
 
   .trade-btn.active:hover,
-  .mode-btn.active:hover,
-  .calculate:hover {
+  .mode-btn.active:hover {
     background: var(--accent-hover);
+    color: #fff7eb;
+  }
+
+  .trade-btn:focus-visible,
+  .mode-btn:focus-visible,
+  .calculate:focus-visible,
+  .gold-menu-btn:focus-visible,
+  .input-row input:focus,
+  .gold-row input:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px var(--focus);
   }
 
   .inputs-wrapper {
-    margin-top: 10px;
-  }
-
-  .input-row,
-  .gold-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 0;
   }
 
   .input-row {
-    background: rgba(255, 255, 255, 0.03);
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 10px 14px;
+    align-items: center;
+    padding: 18px;
+    border-radius: 22px;
+    border: 1px solid rgba(60, 46, 29, 0.08);
+    background: linear-gradient(180deg, rgba(233, 222, 205, 0.85) 0%, rgba(241, 234, 224, 0.92) 100%);
   }
 
   .input-row img {
-    width: 32px;
-    height: 32px;
-    margin-right: 10px;
-  }
-
-  .gold-row img {
-    width: 26px;
-    height: 26px;
+    width: 42px;
+    height: 42px;
   }
 
   .input-row label {
-    min-width: 150px;
-    font-size: 14px;
-    color: var(--text-muted);
-    margin-right: 8px;
-  }
-
-  .gold-row label {
-    font-size: 13px;
-    color: var(--text-muted);
-    min-width: 200px;
+    min-width: 0;
+    margin-right: 0;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.3;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-faint);
   }
 
   .input-row input,
   .gold-row input {
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
-    color: #e5e7eb;
+    width: 100%;
+    background: rgba(255, 252, 247, 0.94);
+    border: 1px solid rgba(60, 46, 29, 0.12);
+    border-radius: 14px;
+    color: var(--text);
     outline: none;
-    transition: border 0.2s;
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      background-color 180ms ease;
+    font-family: inherit;
   }
 
   .input-row input {
-    flex: 1;
-    padding: 8px 12px;
-    font-size: 14px;
+    grid-column: 1 / -1;
+    padding: 14px 16px;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
   }
 
   .gold-row input {
-    width: 120px;
-    padding: 6px 10px;
-    font-size: 13px;
+    justify-self: end;
+    width: 138px;
+    padding: 11px 12px;
+    font-size: 15px;
+    font-weight: 700;
   }
 
-  .input-row input:focus,
-  .gold-row input:focus {
-    border-color: rgba(80, 140, 120, 0.4);
+  .input-row input:hover,
+  .gold-row input:hover {
+    border-color: rgba(60, 46, 29, 0.2);
   }
 
   .input-row input::placeholder,
   .gold-row input::placeholder {
-    color: #4b5563;
+    color: #b7a895;
   }
 
   .calculate {
+    position: relative;
     width: 100%;
-    padding: 12px;
-    margin-top: 16px;
+    margin-top: 20px;
+    padding: 18px 20px;
     border: none;
-    border-radius: 8px;
-    font-size: 16px;
+    border-radius: 18px;
+    background: var(--accent);
+    color: #f6efe2;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     cursor: pointer;
-    font-weight: 600;
+    box-shadow: 0 24px 44px rgba(34, 29, 23, 0.18);
+  }
+
+  .calculate::after {
+    content: "Run";
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: rgba(246, 239, 226, 0.58);
+  }
+
+  .calculate:hover {
+    background: var(--accent-hover);
   }
 
   #output {
-    margin-top: 24px;
+    margin-top: 22px;
     display: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
   }
 
   #output .mode-label {
     animation: result-fade 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
+  .mode-label,
+  .step-box {
+    grid-column: 1 / -1;
+  }
+
   .mode-label {
+    padding: 14px 18px;
+    border-radius: 16px;
+    border: 1px solid rgba(245, 234, 220, 0.14);
+    background: rgba(245, 234, 220, 0.06);
+    color: rgba(244, 231, 213, 0.76);
     text-align: center;
-    margin-bottom: 10px;
-    font-size: 14px;
-    color: var(--text-muted);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   .mode-label span {
-    color: var(--accent-text);
-    font-weight: 600;
+    color: #f7efdf;
+    font-weight: 800;
   }
 
   .step-box {
-    padding: 18px;
-    margin-top: 16px;
+    padding: 22px;
+    background: linear-gradient(180deg, rgba(245, 237, 224, 0.98) 0%, rgba(238, 228, 214, 0.98) 100%);
     animation: result-slide-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   .step-title {
-    font-size: 17px;
-    color: var(--accent-text);
-    margin-bottom: 12px;
+    margin-bottom: 14px;
+    color: var(--text-soft);
     display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 12px;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
   }
 
   .step-title span {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-faint);
-    font-weight: 400;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   .step-row {
     display: flex;
     align-items: center;
-    margin-bottom: 8px;
+    gap: 10px;
+    padding: 10px 0;
+    border-top: 1px solid rgba(60, 46, 29, 0.08);
+  }
+
+  .step-row:first-of-type {
+    border-top: 0;
+    padding-top: 0;
   }
 
   .step-row img {
-    width: 28px;
-    height: 28px;
-    margin-right: 8px;
+    width: 30px;
+    height: 30px;
   }
 
   .step-text {
     font-size: 14px;
     color: var(--text-soft);
+    line-height: 1.5;
   }
 
   .fusion-final {
-    font-size: 22px;
-    font-weight: bold;
-    color: var(--accent-text);
-    text-align: center;
-    margin-top: 8px;
+    margin-top: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 12px;
+    color: var(--accent-text);
+    font-size: clamp(1.55rem, 2vw, 2rem);
+    font-weight: 800;
+    text-align: center;
     animation: result-scale 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
   }
 
   .fusion-icon {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
   }
 
   .fusion-sub {
     text-align: center;
     color: var(--text-faint);
-    margin-top: 4px;
-    font-size: 13px;
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   .hint-warning {
     text-align: center;
     color: var(--warning);
-    font-size: 15px;
-    margin-top: 8px;
-    opacity: 0.85;
+    font-size: 14px;
+    margin-top: 10px;
+    line-height: 1.5;
   }
 
   .gold-total-box {
-    padding: 16px;
-    margin-top: 16px;
-    text-align: center;
+    padding: 18px;
+    background: linear-gradient(180deg, rgba(236, 224, 208, 0.98) 0%, rgba(230, 216, 198, 0.98) 100%);
     animation: result-slide-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
   }
 
   .gold-total-title {
-    font-size: 15px;
-    color: var(--text-soft);
-    margin-bottom: 8px;
+    font-size: 12px;
+    color: var(--text-faint);
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
+    gap: 10px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   .gold-total-title img {
@@ -435,30 +785,118 @@
   }
 
   .gold-total-value {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 28px;
+    font-weight: 800;
     color: var(--gold);
+    letter-spacing: -0.03em;
   }
 
   .comparison-value {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 28px;
+    font-weight: 800;
     color: var(--accent-text);
+    letter-spacing: -0.03em;
   }
 
   .comparison-sub {
-    margin-top: 6px;
+    margin-top: 8px;
     color: var(--text-muted);
     font-size: 13px;
+    line-height: 1.55;
+  }
+
+  @media (max-width: 980px) {
+    .header-main,
+    .builder-top,
+    .inputs-wrapper,
+    #output {
+      grid-template-columns: 1fr;
+    }
+
+    .header-main {
+      display: grid;
+      align-items: start;
+    }
   }
 
   @media (max-width: 700px) {
     body { padding: 16px; }
-    .input-row { flex-wrap: wrap; }
-    .input-row label { margin-bottom: 6px; min-width: auto; }
-    .gold-menu-btn { position: static; margin: 10px auto 0; }
-    .gold-row { flex-wrap: wrap; }
-    .gold-row label { min-width: auto; }
+
+    .glass,
+    .gold-panel,
+    .step-box,
+    .gold-total-box {
+      border-radius: 22px;
+    }
+
+    .glass,
+    .gold-panel {
+      padding: 20px;
+    }
+
+    .builder-block {
+      padding: 16px;
+      border-radius: 18px;
+    }
+
+    .gold-menu-btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .gold-row {
+      grid-template-columns: 24px 1fr;
+    }
+
+    .gold-row input {
+      grid-column: 1 / -1;
+      justify-self: stretch;
+      width: 100%;
+    }
+
+    .market-sync-head,
+    .market-sync-controls {
+      align-items: stretch;
+    }
+
+    .market-sync-head {
+      display: grid;
+    }
+
+    .market-sync-pill,
+    .market-sync-field select,
+    .market-fetch-btn {
+      width: 100%;
+    }
+
+    .trade-btn,
+    .mode-btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .input-row {
+      padding: 16px;
+    }
+
+    .input-row input {
+      font-size: 20px;
+    }
+
+    .calculate::after {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 </style>
 </head>
@@ -467,13 +905,18 @@
 
 <div class="container">
   <div class="header-area">
-    <h1>ShekelFusion</h1>
-    <p class="subtitle">This calculator uses standard Trade Skill materials, which can be exchanged and processed inside your Stronghold.</p>
-    <p class="byline">ShekelFusion</p>
-    <button class="gold-menu-btn" id="goldMenuBtn" type="button">
-      <img src="https://lostarkcodex.com/icons/use_11_215.webp" alt="Gold">
-      Gold Cost
-    </button>
+    <div class="eyebrow">Stronghold Material Planner</div>
+    <div class="header-main">
+      <div class="header-copy">
+        <h1>ShekelFusion</h1>
+        <p class="subtitle">Calculate the best Abidos crafting route from your current trade materials, then compare crafted sale value against selling the raw mats directly.</p>
+        <p class="byline">Per-trade saved inputs, craft costs, sell prices, and raw-material comparison.</p>
+      </div>
+      <button class="gold-menu-btn" id="goldMenuBtn" type="button">
+        <img src="https://lostarkcodex.com/icons/use_11_215.webp" alt="Gold">
+        Pricing Settings
+      </button>
+    </div>
   </div>
 
   <div class="gold-panel" id="goldPanel">
@@ -540,47 +983,81 @@
         <input type="number" id="materialAbidosPrice" placeholder="Gold">
       </div>
     </div>
+
+    <div class="panel-section market-sync-section">
+      <div class="market-sync-head">
+        <h3>
+          <img src="https://lostarkcodex.com/icons/use_11_215.webp" alt="Market">
+          Market Sync
+        </h3>
+        <div class="market-sync-pill" id="marketSyncBadge">Manual</div>
+      </div>
+      <p class="market-sync-copy">Uses the same pattern as Honing Forecast: send `region_slug` + life-skill `item_slugs` to the market worker, then map the returned prices into the saved material inputs.</p>
+      <div class="market-sync-controls">
+        <label class="market-sync-field" for="marketRegion">
+          <span>Region</span>
+          <select id="marketRegion">
+            <option value="EUC">EUC</option>
+            <option value="NAE">NAE</option>
+          </select>
+        </label>
+        <button class="market-fetch-btn" id="fetchMarketBtn" type="button">Fetch Market Data</button>
+      </div>
+      <div class="market-sync-status" id="marketSyncStatus">Manual prices are active.</div>
+      <div class="market-sync-meta" id="marketSyncMeta">Prices found by the worker replace the saved values per trade. Any missing item stays manual, so the calculator never loses coverage.</div>
+    </div>
   </div>
 
   <div class="glass">
-    <div class="trade-buttons" id="tradeButtons"></div>
+    <div class="builder-top">
+      <div class="builder-block">
+        <div class="section-label">Trade Skill</div>
+        <div class="trade-buttons" id="tradeButtons"></div>
+      </div>
 
-    <div class="mode-toggle">
-      <button class="mode-btn active" type="button" data-mode="normal">
-        <img src="https://lostarkcodex.com/icons/use_12_86.webp" alt="Fusion">
-        Abidos Fusion Material
-      </button>
-      <button class="mode-btn" type="button" data-mode="advanced">
-        <img src="https://i.postimg.cc/hP8pjg4N/Use-13-252.png" alt="Advanced Fusion">
-        Advanced Abidos Fusion Material
-      </button>
+      <div class="builder-block">
+        <div class="section-label">Craft Mode</div>
+        <div class="mode-toggle">
+          <button class="mode-btn active" type="button" data-mode="normal">
+            <img src="https://lostarkcodex.com/icons/use_12_86.webp" alt="Fusion">
+            Abidos Fusion Material
+          </button>
+          <button class="mode-btn" type="button" data-mode="advanced">
+            <img src="https://i.postimg.cc/hP8pjg4N/Use-13-252.png" alt="Advanced Fusion">
+            Advanced Abidos Fusion Material
+          </button>
+        </div>
+      </div>
     </div>
 
-    <div id="inputsWrapper" class="inputs-wrapper">
-      <div class="input-row">
-        <img id="iconBase" src="" alt="Base">
-        <label id="labelBase" for="baseInput">Base</label>
-        <input type="number" id="baseInput" placeholder="Enter amount">
-      </div>
-      <div class="input-row">
-        <img id="iconPowder" src="" alt="Powder">
-        <label id="labelPowder" for="powderInput">Powder</label>
-        <input type="number" id="powderInput" placeholder="Enter amount">
-      </div>
-      <div class="input-row">
-        <img id="iconTender" src="" alt="Tender">
-        <label id="labelTender" for="tenderInput">Tender</label>
-        <input type="number" id="tenderInput" placeholder="Enter amount">
-      </div>
-      <div class="input-row" id="sturdyRow">
-        <img id="iconSturdy" src="" alt="Sturdy">
-        <label id="labelSturdy" for="sturdyInput">Sturdy</label>
-        <input type="number" id="sturdyInput" placeholder="Enter amount">
-      </div>
-      <div class="input-row">
-        <img id="iconAbidos" src="" alt="Abidos">
-        <label id="labelAbidos" for="abidosInput">Abidos</label>
-        <input type="number" id="abidosInput" placeholder="Enter amount">
+    <div class="builder-block">
+      <div class="section-label">Owned Materials</div>
+      <div id="inputsWrapper" class="inputs-wrapper">
+        <div class="input-row">
+          <img id="iconBase" src="" alt="Base">
+          <label id="labelBase" for="baseInput">Base</label>
+          <input type="number" id="baseInput" placeholder="Enter amount">
+        </div>
+        <div class="input-row">
+          <img id="iconPowder" src="" alt="Powder">
+          <label id="labelPowder" for="powderInput">Powder</label>
+          <input type="number" id="powderInput" placeholder="Enter amount">
+        </div>
+        <div class="input-row">
+          <img id="iconTender" src="" alt="Tender">
+          <label id="labelTender" for="tenderInput">Tender</label>
+          <input type="number" id="tenderInput" placeholder="Enter amount">
+        </div>
+        <div class="input-row" id="sturdyRow">
+          <img id="iconSturdy" src="" alt="Sturdy">
+          <label id="labelSturdy" for="sturdyInput">Sturdy</label>
+          <input type="number" id="sturdyInput" placeholder="Enter amount">
+        </div>
+        <div class="input-row">
+          <img id="iconAbidos" src="" alt="Abidos">
+          <label id="labelAbidos" for="abidosInput">Abidos</label>
+          <input type="number" id="abidosInput" placeholder="Enter amount">
+        </div>
       </div>
     </div>
 
@@ -597,6 +1074,17 @@
   const MATERIAL_PRICE_STORAGE_KEY = "materialPricesByTrade";
   const CALCULATOR_INPUTS_STORAGE_KEY = "calculatorInputsByTrade";
   const UI_STATE_STORAGE_KEY = "calculatorUiState";
+  const MARKET_CACHE_STORAGE_KEY = "marketPriceCacheByRegion";
+  const MARKET_UI_STORAGE_KEY = "marketSyncUiState";
+  const DEFAULT_MARKET_WORKER_URL = "https://shekelfusion-market-worker.shekelfusion-mult08642.workers.dev";
+  const MARKET_STALE_WARNING_MS = 6 * 60 * 60 * 1000;
+  const MARKET_FIELD_LABELS = {
+    base: "Base",
+    powder: "Powder",
+    tender: "Tender",
+    sturdy: "Sturdy",
+    abidos: "Abidos"
+  };
 
   const trades = {
     logging: {
@@ -709,19 +1197,65 @@
     }
   };
 
+  const marketTradeSlugs = {
+    logging: {
+      base: "timber",
+      powder: null,
+      tender: "tender-timber",
+      sturdy: "sturdy-timber",
+      abidos: "abidos-timber"
+    },
+    foraging: {
+      base: "wild-flower",
+      powder: null,
+      tender: "shy-wild-flower",
+      sturdy: null,
+      abidos: "abidos-wild-flower"
+    },
+    mining: {
+      base: "iron-ore",
+      powder: null,
+      tender: "heavy-iron-ore",
+      sturdy: "strong-iron-ore",
+      abidos: "abidos-iron-ore"
+    },
+    hunting: {
+      base: "thick-raw-meat",
+      powder: null,
+      tender: "treated-meat",
+      sturdy: null,
+      abidos: "abidos-thick-raw-meat"
+    },
+    fishing: {
+      base: "fish",
+      powder: null,
+      tender: "redflesh-fish",
+      sturdy: null,
+      abidos: "abidos-solar-carp"
+    },
+    excavating: {
+      base: "ancient-relic",
+      powder: null,
+      tender: "rare-relic",
+      sturdy: null,
+      abidos: "abidos-relic"
+    }
+  };
+
   let currentTrade = "logging";
   let currentMode = "normal";
+  let marketFetchInFlight = false;
 
   function createParticles() {
     const container = document.getElementById("particles");
-    for (let i = 0; i < 30; i += 1) {
+    for (let i = 0; i < 18; i += 1) {
       const particle = document.createElement("div");
-      const size = 2 + Math.random() * 2;
+      const size = 1.5 + Math.random() * 1.5;
       particle.className = "particle";
       particle.style.left = `${Math.random() * 100}%`;
       particle.style.top = `${Math.random() * 100}%`;
-      particle.style.animationDelay = `${Math.random() * 20}s`;
-      particle.style.animationDuration = `${15 + Math.random() * 10}s`;
+      particle.style.animationDelay = `${Math.random() * 24}s`;
+      particle.style.animationDuration = `${20 + Math.random() * 14}s`;
       particle.style.width = `${size}px`;
       particle.style.height = `${size}px`;
       container.appendChild(particle);
@@ -765,7 +1299,7 @@
 
     const sturdyRow = document.getElementById("sturdyRow");
     if (trade.useSturdy && trade.sturdy && trade.icons.sturdy) {
-      sturdyRow.style.display = "flex";
+      sturdyRow.style.display = "grid";
       document.getElementById("labelSturdy").textContent = trade.sturdy;
       document.getElementById("iconSturdy").src = trade.icons.sturdy;
     } else {
@@ -790,7 +1324,7 @@
       materialPowderPrice.value = "";
       materialPowderPrice.disabled = true;
     } else {
-      materialPowderRow.style.display = "flex";
+      materialPowderRow.style.display = "grid";
       materialPowderLabel.textContent = `${trade.powder} sell price per 100x`;
       materialPowderPrice.placeholder = "Gold";
       materialPowderPrice.disabled = false;
@@ -798,7 +1332,7 @@
 
     const materialSturdyRow = document.getElementById("materialSturdyPriceRow");
     if (trade.useSturdy && trade.sturdy && trade.icons.sturdy) {
-      materialSturdyRow.style.display = "flex";
+      materialSturdyRow.style.display = "grid";
       document.getElementById("materialSturdyLabel").textContent = `${trade.sturdy} sell price per 100x`;
       document.getElementById("materialSturdyIcon").src = trade.icons.sturdy;
     } else {
@@ -1047,6 +1581,273 @@
     }
   }
 
+  function getStoredMarketCache() {
+    try {
+      return JSON.parse(localStorage.getItem(MARKET_CACHE_STORAGE_KEY) || "{}");
+    } catch {
+      return {};
+    }
+  }
+
+  function setStoredMarketCache(cache) {
+    localStorage.setItem(MARKET_CACHE_STORAGE_KEY, JSON.stringify(cache));
+  }
+
+  function saveMarketUiState() {
+    localStorage.setItem(MARKET_UI_STORAGE_KEY, JSON.stringify({
+      region: document.getElementById("marketRegion").value
+    }));
+  }
+
+  function getResolvedMarketEndpoint() {
+    return DEFAULT_MARKET_WORKER_URL;
+  }
+
+  function loadMarketUiState() {
+    try {
+      const uiState = JSON.parse(localStorage.getItem(MARKET_UI_STORAGE_KEY) || "{}");
+      if (uiState.region === "NAE" || uiState.region === "EUC") {
+        document.getElementById("marketRegion").value = uiState.region;
+      } else {
+        document.getElementById("marketRegion").value = "EUC";
+      }
+    } catch {
+      document.getElementById("marketRegion").value = "EUC";
+    }
+  }
+
+  function formatSyncTimestamp(timestamp) {
+    return new Date(timestamp).toLocaleString(undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    });
+  }
+
+  function getNormalizedMarketItems(response) {
+    if (Array.isArray(response)) {
+      return response;
+    }
+
+    if (response && Array.isArray(response.items)) {
+      return response.items;
+    }
+
+    return [];
+  }
+
+  function getLatestMarketTimestamp(response) {
+    const latestTimestampSeconds = getNormalizedMarketItems(response).reduce((latest, entry) => {
+      if (entry && Number.isFinite(entry.timestamp)) {
+        return Math.max(latest, entry.timestamp);
+      }
+      return latest;
+    }, 0);
+
+    if (response && Number.isFinite(response.source_snapshot_at)) {
+      return response.source_snapshot_at;
+    }
+
+    return latestTimestampSeconds > 0 ? latestTimestampSeconds * 1000 : Date.now();
+  }
+
+  function getMarketSnapshotAge(sourceTimestamp) {
+    return Math.max(0, Date.now() - sourceTimestamp);
+  }
+
+  function formatMarketAge(sourceTimestamp) {
+    const ageMs = getMarketSnapshotAge(sourceTimestamp);
+    const ageMinutes = Math.round(ageMs / 60000);
+    if (ageMinutes < 60) {
+      return `${ageMinutes}m old`;
+    }
+    const ageHours = ageMs / 3600000;
+    if (ageHours < 24) {
+      return `${ageHours.toFixed(ageHours >= 10 ? 0 : 1)}h old`;
+    }
+    return `${(ageHours / 24).toFixed(1)}d old`;
+  }
+
+  function setMarketSyncBadge(text, tone = "manual") {
+    const badge = document.getElementById("marketSyncBadge");
+    badge.textContent = text;
+    badge.classList.remove("success", "warn");
+    if (tone === "success") {
+      badge.classList.add("success");
+    } else if (tone === "warn") {
+      badge.classList.add("warn");
+    }
+  }
+
+  function setMarketSyncStatus(status, meta, tone = "manual") {
+    document.getElementById("marketSyncStatus").textContent = status;
+    document.getElementById("marketSyncMeta").textContent = meta;
+    if (tone === "success") {
+      setMarketSyncBadge("Synced", "success");
+    } else if (tone === "warn") {
+      setMarketSyncBadge("Issue", "warn");
+    } else {
+      setMarketSyncBadge("Manual");
+    }
+  }
+
+  function getMarketItemSlugs() {
+    return [...new Set(
+      Object.values(marketTradeSlugs)
+        .flatMap((tradeConfig) => Object.values(tradeConfig))
+        .filter(Boolean)
+    )];
+  }
+
+  function isMarketCacheFresh(region) {
+    const cacheEntry = getStoredMarketCache()[region];
+    if (!cacheEntry || typeof cacheEntry.fetchedAt !== "number") {
+      return false;
+    }
+    return Date.now() - cacheEntry.fetchedAt < 5 * 60 * 1000;
+  }
+
+  function parseMarketResponse(response) {
+    return getNormalizedMarketItems(response).reduce((map, entry) => {
+      if (entry && entry.item_slug && Number.isFinite(entry.price)) {
+        map[entry.item_slug] = entry.price;
+      }
+      return map;
+    }, {});
+  }
+
+  function applyMarketPrices(response, region, sourceTimestamp, fetchedAt = Date.now()) {
+    const slugToPrice = parseMarketResponse(response);
+    const allPrices = getStoredMaterialPrices();
+    let updatedCount = 0;
+    const missingLabels = [];
+
+    Object.entries(marketTradeSlugs).forEach(([tradeKey, tradeConfig]) => {
+      const existingTradePrices = allPrices[tradeKey] || {};
+      const nextTradePrices = {
+        base: existingTradePrices.base || "0",
+        powder: existingTradePrices.powder || "0",
+        tender: existingTradePrices.tender || "0",
+        sturdy: existingTradePrices.sturdy || "0",
+        abidos: existingTradePrices.abidos || "0"
+      };
+
+      Object.entries(tradeConfig).forEach(([field, slug]) => {
+        if (!slug) {
+          return;
+        }
+        if (Object.prototype.hasOwnProperty.call(slugToPrice, slug)) {
+          nextTradePrices[field] = String(slugToPrice[slug]);
+          updatedCount += 1;
+        } else {
+          missingLabels.push(`${trades[tradeKey].label} ${MARKET_FIELD_LABELS[field]}`);
+        }
+      });
+
+      if (trades[tradeKey].powderTradeable === false) {
+        nextTradePrices.powder = "0";
+      }
+
+      allPrices[tradeKey] = nextTradePrices;
+    });
+
+    localStorage.setItem(MATERIAL_PRICE_STORAGE_KEY, JSON.stringify(allPrices));
+    loadMaterialPricesForTrade();
+
+    const cache = getStoredMarketCache();
+    cache[region] = {
+      sourceTimestamp,
+      fetchedAt,
+      response
+    };
+    setStoredMarketCache(cache);
+
+    const missingCount = missingLabels.length;
+    const isStale = getMarketSnapshotAge(sourceTimestamp) >= MARKET_STALE_WARNING_MS;
+    const tone = isStale ? "warn" : "success";
+    const status = `Synced ${updatedCount} market prices for ${region}.`;
+    const meta = missingCount > 0
+      ? `Source snapshot ${formatSyncTimestamp(sourceTimestamp)} (${formatMarketAge(sourceTimestamp)}). ${missingCount} fields were not returned by the worker and stayed manual.`
+      : `Source snapshot ${formatSyncTimestamp(sourceTimestamp)} (${formatMarketAge(sourceTimestamp)}). All mapped life-skill prices were filled from the worker.`;
+    setMarketSyncStatus(status, meta, tone);
+  }
+
+  async function fetchMarketData(region) {
+    const response = await fetch(getResolvedMarketEndpoint(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        region_slug: region.toLowerCase(),
+        item_slugs: getMarketItemSlugs()
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Market request failed (${response.status})`);
+    }
+
+    return response.json();
+  }
+
+  async function handleMarketFetch() {
+    if (marketFetchInFlight) {
+      return;
+    }
+
+    const region = document.getElementById("marketRegion").value;
+    const fetchButton = document.getElementById("fetchMarketBtn");
+
+    marketFetchInFlight = true;
+    fetchButton.disabled = true;
+    fetchButton.textContent = "Fetching...";
+    setMarketSyncStatus(`Fetching ${region} market prices...`, "Requesting a fresh worker response and replacing the saved trade material prices with the returned snapshot.", "manual");
+
+    try {
+      const response = await fetchMarketData(region);
+      const sourceTimestamp = getLatestMarketTimestamp(response);
+      applyMarketPrices(response, region, sourceTimestamp, Date.now());
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown market sync error";
+      setMarketSyncStatus("Market sync failed.", `${message}. Existing manual prices were left untouched.`, "warn");
+    } finally {
+      marketFetchInFlight = false;
+      fetchButton.disabled = false;
+      fetchButton.textContent = "Fetch Market Data";
+    }
+  }
+
+  function refreshMarketSyncSummary() {
+    const region = document.getElementById("marketRegion").value;
+    const cacheEntry = getStoredMarketCache()[region];
+    const sourceTimestamp = cacheEntry?.sourceTimestamp || cacheEntry?.timestamp;
+    if (cacheEntry && typeof sourceTimestamp === "number") {
+      const fetchedAt = cacheEntry.fetchedAt || cacheEntry.timestamp || sourceTimestamp;
+      const recentlyFetched = isMarketCacheFresh(region);
+      const isStale = getMarketSnapshotAge(sourceTimestamp) >= MARKET_STALE_WARNING_MS;
+      const status = isStale
+        ? `${region} market snapshot looks outdated.`
+        : recentlyFetched
+          ? `${region} market snapshot is loaded locally.`
+          : `${region} market snapshot is saved locally.`;
+      const meta = `Source snapshot ${formatSyncTimestamp(sourceTimestamp)} (${formatMarketAge(sourceTimestamp)}). Last fetch in this browser: ${formatSyncTimestamp(fetchedAt)}. Use Fetch Market Data to pull the latest worker snapshot now.`;
+      setMarketSyncStatus(
+        status,
+        meta,
+        isStale ? "warn" : (recentlyFetched ? "success" : "manual")
+      );
+      return;
+    }
+
+    setMarketSyncStatus(
+      "Manual prices are active.",
+      "Fetch fills every mapped life-skill price across all trades. Any item the worker does not return stays manual, so the calculator remains usable.",
+      "manual"
+    );
+  }
+
   function saveGold() {
     localStorage.setItem("goldNormal", document.getElementById("goldNormal").value || "0");
     localStorage.setItem("goldAdvanced", document.getElementById("goldAdvanced").value || "0");
@@ -1204,7 +2005,7 @@
     }
 
     const output = document.getElementById("output");
-    output.style.display = "block";
+    output.style.display = "grid";
     output.innerHTML = `
       <div class="mode-label">Trade skill: <span>${trade.label}</span> • Mode: <span>${data.modeLabel}</span> • Cycles: <span>${data.cycles}</span></div>
       ${stepZero}
@@ -1276,6 +2077,13 @@
   document.getElementById("materialTenderPrice").addEventListener("input", saveGold);
   document.getElementById("materialSturdyPrice").addEventListener("input", saveGold);
   document.getElementById("materialAbidosPrice").addEventListener("input", saveGold);
+  document.getElementById("marketRegion").addEventListener("change", () => {
+    saveMarketUiState();
+    refreshMarketSyncSummary();
+  });
+  document.getElementById("fetchMarketBtn").addEventListener("click", () => {
+    handleMarketFetch();
+  });
   document.getElementById("baseInput").addEventListener("input", saveCurrentInputs);
   document.getElementById("powderInput").addEventListener("input", saveCurrentInputs);
   document.getElementById("tenderInput").addEventListener("input", saveCurrentInputs);
@@ -1283,12 +2091,14 @@
   document.getElementById("abidosInput").addEventListener("input", saveCurrentInputs);
 
   loadUiState();
+  loadMarketUiState();
   createParticles();
   renderTradeButtons();
   setupModeButtons();
   syncModeButtons();
   updateTradeUI();
   loadGold();
+  refreshMarketSyncSummary();
 </script>
 </body>
 </html>

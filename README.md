@@ -1,6 +1,6 @@
 # ShekelFusion
 
-This folder contains the local standalone `ShekelFusion` site, based on the calculator at `https://fusion.amnx.de/`, so you can edit the UI and logic directly.
+This folder contains the local standalone `ShekelFusion` site, served at `http://localhost:4173/`, so you can edit the UI and logic directly.
 
 Important:
 
