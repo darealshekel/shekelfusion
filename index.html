@@ -595,6 +595,8 @@
   const ICON_ADVANCED = "https://i.postimg.cc/hP8pjg4N/Use-13-252.png";
   const GOLD_ICON = "https://lostarkcodex.com/icons/use_11_215.webp";
   const MATERIAL_PRICE_STORAGE_KEY = "materialPricesByTrade";
+  const CALCULATOR_INPUTS_STORAGE_KEY = "calculatorInputsByTrade";
+  const UI_STATE_STORAGE_KEY = "calculatorUiState";
 
   const trades = {
     logging: {
@@ -735,7 +737,9 @@
 
     wrapper.querySelectorAll(".trade-btn").forEach((button) => {
       button.addEventListener("click", () => {
+        saveCurrentInputs();
         currentTrade = button.dataset.trade;
+        saveUiState();
         renderTradeButtons();
         updateTradeUI();
       });
@@ -784,15 +788,22 @@
     }
 
     loadMaterialPricesForTrade();
+    loadCurrentInputs();
   }
 
   function setupModeButtons() {
     document.querySelectorAll(".mode-btn").forEach((button) => {
       button.addEventListener("click", () => {
-        document.querySelectorAll(".mode-btn").forEach((other) => other.classList.remove("active"));
-        button.classList.add("active");
         currentMode = button.dataset.mode;
+        syncModeButtons();
+        saveUiState();
       });
+    });
+  }
+
+  function syncModeButtons() {
+    document.querySelectorAll(".mode-btn").forEach((button) => {
+      button.classList.toggle("active", button.dataset.mode === currentMode);
     });
   }
 
@@ -963,12 +974,65 @@
     document.getElementById("materialSturdyPrice").value = tradePrices.sturdy && tradePrices.sturdy !== "0" ? tradePrices.sturdy : "";
   }
 
+  function getStoredCalculatorInputs() {
+    try {
+      return JSON.parse(localStorage.getItem(CALCULATOR_INPUTS_STORAGE_KEY) || "{}");
+    } catch {
+      return {};
+    }
+  }
+
+  function saveCurrentInputs() {
+    const allInputs = getStoredCalculatorInputs();
+    allInputs[currentTrade] = {
+      base: document.getElementById("baseInput").value || "",
+      powder: document.getElementById("powderInput").value || "",
+      tender: document.getElementById("tenderInput").value || "",
+      sturdy: document.getElementById("sturdyInput").value || "",
+      abidos: document.getElementById("abidosInput").value || ""
+    };
+    localStorage.setItem(CALCULATOR_INPUTS_STORAGE_KEY, JSON.stringify(allInputs));
+  }
+
+  function loadCurrentInputs() {
+    const tradeInputs = getStoredCalculatorInputs()[currentTrade] || {};
+    document.getElementById("baseInput").value = tradeInputs.base || "";
+    document.getElementById("powderInput").value = tradeInputs.powder || "";
+    document.getElementById("tenderInput").value = tradeInputs.tender || "";
+    document.getElementById("abidosInput").value = tradeInputs.abidos || "";
+    document.getElementById("sturdyInput").value = tradeInputs.sturdy || "";
+  }
+
+  function saveUiState() {
+    localStorage.setItem(UI_STATE_STORAGE_KEY, JSON.stringify({
+      currentTrade,
+      currentMode
+    }));
+  }
+
+  function loadUiState() {
+    try {
+      const uiState = JSON.parse(localStorage.getItem(UI_STATE_STORAGE_KEY) || "{}");
+      if (uiState.currentTrade && trades[uiState.currentTrade]) {
+        currentTrade = uiState.currentTrade;
+      }
+      if (uiState.currentMode === "normal" || uiState.currentMode === "advanced") {
+        currentMode = uiState.currentMode;
+      }
+    } catch {
+      currentTrade = "logging";
+      currentMode = "normal";
+    }
+  }
+
   function saveGold() {
     localStorage.setItem("goldNormal", document.getElementById("goldNormal").value || "0");
     localStorage.setItem("goldAdvanced", document.getElementById("goldAdvanced").value || "0");
     localStorage.setItem("saleNormal", document.getElementById("saleNormal").value || "0");
     localStorage.setItem("saleAdvanced", document.getElementById("saleAdvanced").value || "0");
     saveMaterialPricesForTrade();
+    saveCurrentInputs();
+    saveUiState();
   }
 
   function loadGold() {
@@ -1190,10 +1254,17 @@
   document.getElementById("materialTenderPrice").addEventListener("input", saveGold);
   document.getElementById("materialSturdyPrice").addEventListener("input", saveGold);
   document.getElementById("materialAbidosPrice").addEventListener("input", saveGold);
+  document.getElementById("baseInput").addEventListener("input", saveCurrentInputs);
+  document.getElementById("powderInput").addEventListener("input", saveCurrentInputs);
+  document.getElementById("tenderInput").addEventListener("input", saveCurrentInputs);
+  document.getElementById("sturdyInput").addEventListener("input", saveCurrentInputs);
+  document.getElementById("abidosInput").addEventListener("input", saveCurrentInputs);
 
+  loadUiState();
   createParticles();
   renderTradeButtons();
   setupModeButtons();
+  syncModeButtons();
   updateTradeUI();
   loadGold();
 </script>
