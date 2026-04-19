@@ -1877,6 +1877,100 @@
     }
   }
 
+  function formatGoldValue(value) {
+    const rounded = Math.round(value * 100) / 100;
+    return rounded.toLocaleString(undefined, {
+      minimumFractionDigits: Number.isInteger(rounded) ? 0 : 2,
+      maximumFractionDigits: Number.isInteger(rounded) ? 0 : 2
+    });
+  }
+
+  function buildRecipeRequirements(advanced) {
+    return advanced
+      ? { abidos: 43, tender: 59, base: 112, modeLabel: "Advanced Abidos Fusion Material" }
+      : { abidos: 33, tender: 45, base: 86, modeLabel: "Abidos Fusion Material" };
+  }
+
+  function calculateEffectiveMaterialUnitCosts(trade, prices) {
+    const costs = {
+      base: prices.base > 0 ? prices.base / 100 : Number.POSITIVE_INFINITY,
+      powder: trade.powderTradeable !== false && prices.powder > 0 ? prices.powder / 100 : Number.POSITIVE_INFINITY,
+      tender: prices.tender > 0 ? prices.tender / 100 : Number.POSITIVE_INFINITY,
+      sturdy: trade.useSturdy && prices.sturdy > 0 ? prices.sturdy / 100 : Number.POSITIVE_INFINITY,
+      abidos: prices.abidos > 0 ? prices.abidos / 100 : Number.POSITIVE_INFINITY
+    };
+
+    const sources = {
+      base: Number.isFinite(costs.base) ? `Buy ${trade.base}` : null,
+      powder: Number.isFinite(costs.powder) ? `Buy ${trade.powder}` : null,
+      tender: Number.isFinite(costs.tender) ? `Buy ${trade.tender}` : null,
+      sturdy: Number.isFinite(costs.sturdy) ? `Buy ${trade.sturdy}` : null,
+      abidos: Number.isFinite(costs.abidos) ? `Buy ${trade.abidos}` : null
+    };
+
+    function relax(target, candidateCost, candidateSource) {
+      if (candidateCost + 1e-9 < costs[target]) {
+        costs[target] = candidateCost;
+        sources[target] = candidateSource;
+      }
+    }
+
+    for (let iteration = 0; iteration < 12; iteration += 1) {
+      relax("base", costs.sturdy / 10, `Buy ${trade.sturdy} and convert`);
+      relax("base", costs.powder * 2, `Use ${sources.powder || trade.powder} for ${trade.base}`);
+      relax("tender", costs.powder * 2, `Use ${sources.powder || trade.powder} for ${trade.tender}`);
+      relax("abidos", costs.powder * 10, `Use ${sources.powder || trade.powder} for ${trade.abidos}`);
+      relax("powder", costs.base * 1.25, `Convert ${sources.base || trade.base} into ${trade.powder}`);
+      relax("powder", costs.tender * 0.625, `Convert ${sources.tender || trade.tender} into ${trade.powder}`);
+    }
+
+    return {
+      costs,
+      sources
+    };
+  }
+
+  function getBuyVsCraftComparison(trade, requirements, marketPrices, costPer10, fusionMarketPrice, projectedFusionCount) {
+    if (!(costPer10 > 0) || !(fusionMarketPrice > 0)) {
+      return null;
+    }
+
+    const effective = calculateEffectiveMaterialUnitCosts(trade, marketPrices);
+    const baseUnit = effective.costs.base;
+    const tenderUnit = effective.costs.tender;
+    const abidosUnit = effective.costs.abidos;
+
+    if (![baseUnit, tenderUnit, abidosUnit].every((value) => Number.isFinite(value) && value > 0)) {
+      return null;
+    }
+
+    const rawMatCostPer10 =
+      (requirements.base * baseUnit) +
+      (requirements.tender * tenderUnit) +
+      (requirements.abidos * abidosUnit);
+
+    const buyAndCraftCostPer10 = rawMatCostPer10 + costPer10;
+    const directFusionCostPer10 = fusionMarketPrice * 10;
+    const perTenDifference = directFusionCostPer10 - buyAndCraftCostPer10;
+
+    const projectedCycles = projectedFusionCount > 0 ? projectedFusionCount / 10 : 0;
+    const projectedCraftCost = projectedCycles > 0 ? buyAndCraftCostPer10 * projectedCycles : 0;
+    const projectedDirectCost = projectedCycles > 0 ? directFusionCostPer10 * projectedCycles : 0;
+    const projectedDifference = projectedDirectCost - projectedCraftCost;
+
+    return {
+      rawMatCostPer10,
+      buyAndCraftCostPer10,
+      directFusionCostPer10,
+      perTenDifference,
+      projectedCycles,
+      projectedCraftCost,
+      projectedDirectCost,
+      projectedDifference,
+      effectiveSources: effective.sources
+    };
+  }
+
   function runCalc() {
     const trade = trades[currentTrade];
     const base = parseInt(document.getElementById("baseInput").value || "0", 10);
@@ -1885,6 +1979,7 @@
     const sturdy = trade.useSturdy ? parseInt(document.getElementById("sturdyInput").value || "0", 10) : 0;
     const abidos = parseInt(document.getElementById("abidosInput").value || "0", 10);
     const advanced = currentMode === "advanced";
+    const requirements = buildRecipeRequirements(advanced);
     const data = calculate(base, powder, tender, sturdy, abidos, advanced, trade.useSturdy);
     const fusionIcon = advanced ? ICON_ADVANCED : ICON_NORMAL;
     const workingActions = data.fusionMaterial / 10;
@@ -1908,6 +2003,20 @@
       ((tender / 100) * materialTenderPrice) +
       ((sturdy / 100) * materialSturdyPrice) +
       ((abidos / 100) * materialAbidosPrice);
+    const buyVsCraft = getBuyVsCraftComparison(
+      trade,
+      requirements,
+      {
+        base: materialBasePrice,
+        powder: materialPowderPrice,
+        tender: materialTenderPrice,
+        sturdy: materialSturdyPrice,
+        abidos: materialAbidosPrice
+      },
+      costPer10,
+      sellPricePerOne,
+      data.fusionMaterial
+    );
 
     let stepZero = "";
     if (trade.useSturdy && data.sturdyToBaseTimes > 0) {
@@ -2004,6 +2113,37 @@
       `;
     }
 
+    let marketBuyVsCraftHtml = "";
+    if (buyVsCraft) {
+      const betterOption = buyVsCraft.perTenDifference > 0
+        ? "Buy Raw Mats + Craft"
+        : buyVsCraft.perTenDifference < 0
+          ? "Buy Fusion Directly"
+          : "Either Option";
+      const perTenSummary = buyVsCraft.perTenDifference > 0
+        ? `Crafting from bought mats saves ${formatGoldValue(Math.abs(buyVsCraft.perTenDifference))} Gold per 10x`
+        : buyVsCraft.perTenDifference < 0
+          ? `Buying fusion directly saves ${formatGoldValue(Math.abs(buyVsCraft.perTenDifference))} Gold per 10x`
+          : "Buying mats and buying fusion cost the same per 10x";
+      const projectedSummary = buyVsCraft.projectedCycles > 0
+        ? `For ${data.fusionMaterial.toLocaleString()} fusion: ${formatGoldValue(Math.abs(buyVsCraft.projectedDifference))} Gold ${buyVsCraft.projectedDifference > 0 ? "saved by crafting" : buyVsCraft.projectedDifference < 0 ? "saved by buying direct" : "difference"}`
+        : "Enter owned mats to see the same comparison scaled to your current output quantity.";
+
+      marketBuyVsCraftHtml = `
+        <div class="gold-total-box">
+          <div class="gold-total-title">
+            <img src="${buyVsCraft.perTenDifference >= 0 ? trade.icons.trade : fusionIcon}" alt="Buy vs Craft">
+            Buy Mats vs Buy Fusion
+          </div>
+          <div class="comparison-value">${betterOption}</div>
+          <div class="comparison-sub">${perTenSummary}</div>
+          <div class="comparison-sub">Raw mats per 10x: ${formatGoldValue(buyVsCraft.rawMatCostPer10)} Gold • Craft fee per 10x: ${formatGoldValue(costPer10)} Gold</div>
+          <div class="comparison-sub">Buy mats + craft per 10x: ${formatGoldValue(buyVsCraft.buyAndCraftCostPer10)} Gold • Buy fusion direct per 10x: ${formatGoldValue(buyVsCraft.directFusionCostPer10)} Gold</div>
+          <div class="comparison-sub">${projectedSummary}</div>
+        </div>
+      `;
+    }
+
     const output = document.getElementById("output");
     output.style.display = "grid";
     output.innerHTML = `
@@ -2062,6 +2202,7 @@
       ${saleHtml}
       ${netCraftHtml}
       ${rawMaterialHtml}
+      ${marketBuyVsCraftHtml}
       ${comparisonHtml}
     `;
   }
