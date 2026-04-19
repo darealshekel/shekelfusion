@@ -1210,7 +1210,7 @@
         </h3>
         <div class="market-sync-pill" id="marketSyncBadge">Manual</div>
       </div>
-      <p class="market-sync-copy">Fetch checks the market worker right now, then maps the returned life-skill prices into the saved material inputs. If the upstream market source is stale, the status below shows both the check time and the source snapshot time.</p>
+      <p class="market-sync-copy">Fetch checks your ShekelFusion market collector right now, then maps the stored life-skill prices into the saved material inputs. The status below shows both the check time and the oldest matching collector snapshot time.</p>
       <div class="market-sync-controls">
         <label class="market-sync-field" for="marketRegion">
           <span>Region</span>
@@ -1966,11 +1966,11 @@
 
   function buildMarketSyncMeta(sourceTimestamp, fetchedAt, missingCount = 0) {
     const checkedText = `Checked ${formatSyncTimestamp(fetchedAt)}.`;
-    const snapshotText = `Upstream snapshot ${formatSyncTimestamp(sourceTimestamp)} (${formatMarketAge(sourceTimestamp)}).`;
+    const snapshotText = `Collector snapshot ${formatSyncTimestamp(sourceTimestamp)} (${formatMarketAge(sourceTimestamp)}).`;
     const isStale = getMarketSnapshotAge(sourceTimestamp) >= MARKET_STALE_WARNING_MS;
     const freshnessText = isStale
-      ? " The fetch worked, but the upstream market source is stale right now."
-      : " The upstream market source looks current.";
+      ? " The fetch worked, but your stored collector data is stale right now."
+      : " Your stored collector data looks current.";
     const coverageText = missingCount > 0
       ? ` ${missingCount} fields were not returned by the worker and stayed manual.`
       : " All mapped life-skill prices were filled from the worker.";
@@ -2090,7 +2090,7 @@
     marketFetchInFlight = true;
     fetchButton.disabled = true;
     fetchButton.textContent = "Fetching...";
-    setMarketSyncStatus(`Fetching ${region} market prices...`, "Checking the worker now and replacing the saved trade material prices with whatever snapshot the upstream source returns.", "manual");
+    setMarketSyncStatus(`Fetching ${region} market prices...`, "Checking your collector now and replacing the saved trade material prices with the latest stored snapshot for the requested items.", "manual");
 
     try {
       const response = await fetchMarketData(region);
@@ -2098,7 +2098,10 @@
       applyMarketPrices(response, region, sourceTimestamp, Date.now());
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown market sync error";
-      setMarketSyncStatus("Market sync failed.", `${message}. Existing manual prices were left untouched.`, "warn");
+      const detail = message.includes("No owned market snapshot exists yet")
+        ? `No stored ${region} collector snapshot exists yet. Run your collector upload first, then fetch again. Existing manual prices were left untouched.`
+        : `${message}. Existing manual prices were left untouched.`;
+      setMarketSyncStatus("Market sync failed.", detail, "warn");
     } finally {
       marketFetchInFlight = false;
       fetchButton.disabled = false;
