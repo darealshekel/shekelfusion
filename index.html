@@ -1210,7 +1210,7 @@
         </h3>
         <div class="market-sync-pill" id="marketSyncBadge">Manual</div>
       </div>
-      <p class="market-sync-copy">Uses the same pattern as Honing Forecast: send `region_slug` + life-skill `item_slugs` to the market worker, then map the returned prices into the saved material inputs.</p>
+      <p class="market-sync-copy">Fetch checks the market worker right now, then maps the returned life-skill prices into the saved material inputs. If the upstream market source is stale, the status below shows both the check time and the source snapshot time.</p>
       <div class="market-sync-controls">
         <label class="market-sync-field" for="marketRegion">
           <span>Region</span>
@@ -1964,6 +1964,20 @@
     }
   }
 
+  function buildMarketSyncMeta(sourceTimestamp, fetchedAt, missingCount = 0) {
+    const checkedText = `Checked ${formatSyncTimestamp(fetchedAt)}.`;
+    const snapshotText = `Upstream snapshot ${formatSyncTimestamp(sourceTimestamp)} (${formatMarketAge(sourceTimestamp)}).`;
+    const isStale = getMarketSnapshotAge(sourceTimestamp) >= MARKET_STALE_WARNING_MS;
+    const freshnessText = isStale
+      ? " The fetch worked, but the upstream market source is stale right now."
+      : " The upstream market source looks current.";
+    const coverageText = missingCount > 0
+      ? ` ${missingCount} fields were not returned by the worker and stayed manual.`
+      : " All mapped life-skill prices were filled from the worker.";
+
+    return `${checkedText} ${snapshotText}${freshnessText}${coverageText}`;
+  }
+
   function getMarketItemSlugs() {
     return [...new Set(
       Object.values(marketTradeSlugs)
@@ -2038,10 +2052,10 @@
     const missingCount = missingLabels.length;
     const isStale = getMarketSnapshotAge(sourceTimestamp) >= MARKET_STALE_WARNING_MS;
     const tone = isStale ? "warn" : "success";
-    const status = `Synced ${updatedCount} market prices for ${region}.`;
-    const meta = missingCount > 0
-      ? `Source snapshot ${formatSyncTimestamp(sourceTimestamp)} (${formatMarketAge(sourceTimestamp)}). ${missingCount} fields were not returned by the worker and stayed manual.`
-      : `Source snapshot ${formatSyncTimestamp(sourceTimestamp)} (${formatMarketAge(sourceTimestamp)}). All mapped life-skill prices were filled from the worker.`;
+    const status = isStale
+      ? `Fetched ${region} prices, but the upstream snapshot is stale.`
+      : `Synced ${updatedCount} market prices for ${region}.`;
+    const meta = buildMarketSyncMeta(sourceTimestamp, fetchedAt, missingCount);
     setMarketSyncStatus(status, meta, tone);
     renderMarketPlanner();
   }
@@ -2076,7 +2090,7 @@
     marketFetchInFlight = true;
     fetchButton.disabled = true;
     fetchButton.textContent = "Fetching...";
-    setMarketSyncStatus(`Fetching ${region} market prices...`, "Requesting a fresh worker response and replacing the saved trade material prices with the returned snapshot.", "manual");
+    setMarketSyncStatus(`Fetching ${region} market prices...`, "Checking the worker now and replacing the saved trade material prices with whatever snapshot the upstream source returns.", "manual");
 
     try {
       const response = await fetchMarketData(region);
@@ -2101,11 +2115,11 @@
       const recentlyFetched = isMarketCacheFresh(region);
       const isStale = getMarketSnapshotAge(sourceTimestamp) >= MARKET_STALE_WARNING_MS;
       const status = isStale
-        ? `${region} market snapshot looks outdated.`
+        ? `${region} market fetch succeeded, but the saved source snapshot is stale.`
         : recentlyFetched
-          ? `${region} market snapshot is loaded locally.`
-          : `${region} market snapshot is saved locally.`;
-      const meta = `Source snapshot ${formatSyncTimestamp(sourceTimestamp)} (${formatMarketAge(sourceTimestamp)}). Last fetch in this browser: ${formatSyncTimestamp(fetchedAt)}. Use Fetch Market Data to pull the latest worker snapshot now.`;
+          ? `${region} market prices were checked recently.`
+          : `${region} market prices are loaded from a saved fetch.`;
+      const meta = `${buildMarketSyncMeta(sourceTimestamp, fetchedAt)} Use Fetch Market Data to check the worker again now.`;
       setMarketSyncStatus(
         status,
         meta,
