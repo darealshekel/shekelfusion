@@ -2073,6 +2073,26 @@
     });
 
     if (!response.ok) {
+      let detail = "";
+      const contentType = response.headers.get("content-type") || "";
+
+      try {
+        if (contentType.includes("application/json")) {
+          const errorPayload = await response.json();
+          if (errorPayload && typeof errorPayload.error === "string") {
+            detail = errorPayload.error.trim();
+          }
+        } else {
+          detail = (await response.text()).trim();
+        }
+      } catch (error) {
+        detail = "";
+      }
+
+      if (detail) {
+        throw new Error(detail);
+      }
+
       throw new Error(`Market request failed (${response.status})`);
     }
 
