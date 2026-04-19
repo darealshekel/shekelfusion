@@ -767,6 +767,213 @@
     animation: result-slide-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
   }
 
+  .market-plan-shell {
+    margin-bottom: 18px;
+  }
+
+  .planner-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 20px;
+  }
+
+  .planner-title {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    line-height: 0.96;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .planner-kicker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(60, 46, 29, 0.12);
+    background: rgba(255, 252, 247, 0.86);
+    color: var(--text-soft);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .planner-note {
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .market-plan-grid,
+  .planner-results {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .planner-input-row {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 10px 14px;
+    align-items: center;
+    padding: 18px;
+    border-radius: 22px;
+    border: 1px solid rgba(60, 46, 29, 0.08);
+    background: linear-gradient(180deg, rgba(233, 222, 205, 0.85) 0%, rgba(241, 234, 224, 0.92) 100%);
+  }
+
+  .planner-input-row img {
+    width: 42px;
+    height: 42px;
+  }
+
+  .planner-input-row label {
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.3;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .planner-input-row input {
+    grid-column: 1 / -1;
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(60, 46, 29, 0.12);
+    background: rgba(255, 252, 247, 0.94);
+    color: var(--text);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    outline: none;
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      background-color 180ms ease;
+    font-family: inherit;
+  }
+
+  .planner-input-row input:hover {
+    border-color: rgba(60, 46, 29, 0.2);
+  }
+
+  .planner-input-row input:focus {
+    box-shadow: 0 0 0 4px var(--focus);
+  }
+
+  .planner-context {
+    display: grid;
+    gap: 10px;
+  }
+
+  .planner-context-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 0;
+    border-top: 1px solid rgba(60, 46, 29, 0.08);
+    color: var(--text-soft);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .planner-context-item:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .planner-context-item strong {
+    color: var(--accent-text);
+    font-size: 14px;
+    letter-spacing: -0.01em;
+    text-align: right;
+  }
+
+  .planner-results {
+    margin-top: 16px;
+  }
+
+  .planner-results .gold-total-box:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .planner-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .planner-summary-chip {
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(60, 46, 29, 0.08);
+    background: rgba(255, 251, 245, 0.66);
+  }
+
+  .planner-summary-chip span {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--text-faint);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .planner-summary-chip strong {
+    color: var(--text-soft);
+    font-size: 16px;
+    letter-spacing: -0.02em;
+  }
+
+  .planner-material-list,
+  .planner-source-list {
+    display: grid;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .planner-material-row,
+  .planner-source-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    color: var(--text-soft);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .planner-material-row strong,
+  .planner-source-row strong {
+    color: var(--accent-text);
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    text-align: right;
+  }
+
+  .planner-empty {
+    grid-column: 1 / -1;
+    padding: 18px;
+    border-radius: 18px;
+    border: 1px dashed rgba(60, 46, 29, 0.14);
+    background: rgba(255, 252, 247, 0.62);
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
   .gold-total-title {
     font-size: 12px;
     color: var(--text-faint);
@@ -809,13 +1016,20 @@
     .header-main,
     .builder-top,
     .inputs-wrapper,
-    #output {
+    #output,
+    .market-plan-grid,
+    .planner-results,
+    .planner-summary-grid {
       grid-template-columns: 1fr;
     }
 
     .header-main {
       display: grid;
       align-items: start;
+    }
+
+    .planner-header {
+      display: grid;
     }
   }
 
@@ -880,6 +1094,10 @@
     }
 
     .input-row input {
+      font-size: 20px;
+    }
+
+    .planner-input-row input {
       font-size: 20px;
     }
 
@@ -1064,6 +1282,53 @@
     <button class="calculate" id="calculateBtn" type="button">Calculate</button>
   </div>
 
+  <div class="glass market-plan-shell">
+    <div class="planner-header">
+      <div>
+        <div class="section-label">Market Craft Planner</div>
+        <h2 class="planner-title">Buy Mats or Buy Fusion</h2>
+        <p class="planner-note">Plan against the market without using your owned mats. Enter the fusion amount you want and ShekelFusion will show the total craft mats, action energy, and whether buying raw mats to craft or buying fusion directly is cheaper.</p>
+      </div>
+      <div class="planner-kicker" id="plannerModeBadge">Abidos Fusion Material</div>
+    </div>
+
+    <div class="market-plan-grid">
+      <div class="builder-block">
+        <div class="section-label">Target Output</div>
+        <div class="planner-input-row">
+          <img id="plannerFusionIcon" src="https://lostarkcodex.com/icons/use_12_86.webp" alt="Fusion Material">
+          <label for="targetFusionCount">Fusion to acquire</label>
+          <input type="number" id="targetFusionCount" min="1" step="1" placeholder="Enter amount">
+        </div>
+        <div class="planner-note" id="plannerBatchNote">Crafting works in 10x batches. Enter any amount and the planner will round up to the next full batch when needed.</div>
+      </div>
+
+      <div class="builder-block">
+        <div class="section-label">Current Pricing Context</div>
+        <div class="planner-context">
+          <div class="planner-context-item">
+            <span id="plannerTradeContext">Trade Skill</span>
+            <strong id="plannerTradeValue">Logging</strong>
+          </div>
+          <div class="planner-context-item">
+            <span id="plannerFusionPriceLabel">Fusion market price</span>
+            <strong id="plannerFusionPriceValue">Missing</strong>
+          </div>
+          <div class="planner-context-item">
+            <span id="plannerCraftCostLabel">Craft fee per 10x</span>
+            <strong id="plannerCraftCostValue">Missing</strong>
+          </div>
+          <div class="planner-context-item">
+            <span id="plannerEnergyLabel">Action energy per 10x</span>
+            <strong id="plannerEnergyValue">273 energy</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="marketPlannerOutput" class="planner-results"></div>
+  </div>
+
   <div id="output"></div>
 </div>
 
@@ -1076,8 +1341,13 @@
   const UI_STATE_STORAGE_KEY = "calculatorUiState";
   const MARKET_CACHE_STORAGE_KEY = "marketPriceCacheByRegion";
   const MARKET_UI_STORAGE_KEY = "marketSyncUiState";
+  const BUY_PLANNER_STORAGE_KEY = "buyVsCraftPlannerState";
   const DEFAULT_MARKET_WORKER_URL = "https://shekelfusion-market-worker.shekelfusion-mult08642.workers.dev";
   const MARKET_STALE_WARNING_MS = 6 * 60 * 60 * 1000;
+  const ACTION_ENERGY_PER_TEN = {
+    normal: 273,
+    advanced: 342
+  };
   const MARKET_FIELD_LABELS = {
     base: "Base",
     powder: "Powder",
@@ -1342,6 +1612,7 @@
 
     loadMaterialPricesForTrade();
     loadCurrentInputs();
+    renderMarketPlanner();
   }
 
   function setupModeButtons() {
@@ -1350,6 +1621,7 @@
         currentMode = button.dataset.mode;
         syncModeButtons();
         saveUiState();
+        renderMarketPlanner();
       });
     });
   }
@@ -1771,6 +2043,7 @@
       ? `Source snapshot ${formatSyncTimestamp(sourceTimestamp)} (${formatMarketAge(sourceTimestamp)}). ${missingCount} fields were not returned by the worker and stayed manual.`
       : `Source snapshot ${formatSyncTimestamp(sourceTimestamp)} (${formatMarketAge(sourceTimestamp)}). All mapped life-skill prices were filled from the worker.`;
     setMarketSyncStatus(status, meta, tone);
+    renderMarketPlanner();
   }
 
   async function fetchMarketData(region) {
@@ -1856,6 +2129,7 @@
     saveMaterialPricesForTrade();
     saveCurrentInputs();
     saveUiState();
+    renderMarketPlanner();
   }
 
   function loadGold() {
@@ -1891,6 +2165,10 @@
       : { abidos: 33, tender: 45, base: 86, modeLabel: "Abidos Fusion Material" };
   }
 
+  function getActionEnergyPerTen(advanced) {
+    return advanced ? ACTION_ENERGY_PER_TEN.advanced : ACTION_ENERGY_PER_TEN.normal;
+  }
+
   function calculateEffectiveMaterialUnitCosts(trade, prices) {
     const costs = {
       base: prices.base > 0 ? prices.base / 100 : Number.POSITIVE_INFINITY,
@@ -1915,13 +2193,17 @@
       }
     }
 
+    function appendConversion(source, targetLabel) {
+      return source ? `${source}, then convert to ${targetLabel}` : `Convert to ${targetLabel}`;
+    }
+
     for (let iteration = 0; iteration < 12; iteration += 1) {
-      relax("base", costs.sturdy / 10, `Buy ${trade.sturdy} and convert`);
-      relax("base", costs.powder * 2, `Use ${sources.powder || trade.powder} for ${trade.base}`);
-      relax("tender", costs.powder * 2, `Use ${sources.powder || trade.powder} for ${trade.tender}`);
-      relax("abidos", costs.powder * 10, `Use ${sources.powder || trade.powder} for ${trade.abidos}`);
-      relax("powder", costs.base * 1.25, `Convert ${sources.base || trade.base} into ${trade.powder}`);
-      relax("powder", costs.tender * 0.625, `Convert ${sources.tender || trade.tender} into ${trade.powder}`);
+      relax("base", costs.sturdy / 10, appendConversion(`Buy ${trade.sturdy}`, trade.base));
+      relax("base", costs.powder * 2, appendConversion(sources.powder || `Buy ${trade.powder}`, trade.base));
+      relax("tender", costs.powder * 2, appendConversion(sources.powder || `Buy ${trade.powder}`, trade.tender));
+      relax("abidos", costs.powder * 10, appendConversion(sources.powder || `Buy ${trade.powder}`, trade.abidos));
+      relax("powder", costs.base * 1.25, appendConversion(sources.base || `Buy ${trade.base}`, trade.powder));
+      relax("powder", costs.tender * 0.625, appendConversion(sources.tender || `Buy ${trade.tender}`, trade.powder));
     }
 
     return {
@@ -1930,7 +2212,7 @@
     };
   }
 
-  function getBuyVsCraftComparison(trade, requirements, marketPrices, costPer10, fusionMarketPrice, projectedFusionCount) {
+  function getBuyVsCraftComparison(trade, requirements, marketPrices, costPer10, fusionMarketPrice, requestedFusionCount) {
     if (!(costPer10 > 0) || !(fusionMarketPrice > 0)) {
       return null;
     }
@@ -1952,10 +2234,14 @@
     const buyAndCraftCostPer10 = rawMatCostPer10 + costPer10;
     const directFusionCostPer10 = fusionMarketPrice * 10;
     const perTenDifference = directFusionCostPer10 - buyAndCraftCostPer10;
-
-    const projectedCycles = projectedFusionCount > 0 ? projectedFusionCount / 10 : 0;
-    const projectedCraftCost = projectedCycles > 0 ? buyAndCraftCostPer10 * projectedCycles : 0;
-    const projectedDirectCost = projectedCycles > 0 ? directFusionCostPer10 * projectedCycles : 0;
+    const requestedCount = Math.max(0, Math.floor(requestedFusionCount || 0));
+    const craftBatches = requestedCount > 0 ? Math.ceil(requestedCount / 10) : 0;
+    const craftOutput = craftBatches * 10;
+    const extraFusion = Math.max(0, craftOutput - requestedCount);
+    const rawMatCostTotal = craftBatches > 0 ? rawMatCostPer10 * craftBatches : 0;
+    const totalCraftFee = craftBatches > 0 ? costPer10 * craftBatches : 0;
+    const projectedCraftCost = craftBatches > 0 ? buyAndCraftCostPer10 * craftBatches : 0;
+    const projectedDirectCost = requestedCount > 0 ? fusionMarketPrice * requestedCount : 0;
     const projectedDifference = projectedDirectCost - projectedCraftCost;
 
     return {
@@ -1963,12 +2249,230 @@
       buyAndCraftCostPer10,
       directFusionCostPer10,
       perTenDifference,
-      projectedCycles,
+      requestedCount,
+      craftBatches,
+      craftOutput,
+      extraFusion,
+      rawMatCostTotal,
+      totalCraftFee,
       projectedCraftCost,
       projectedDirectCost,
       projectedDifference,
       effectiveSources: effective.sources
     };
+  }
+
+  function getCurrentPricingContext() {
+    const advanced = currentMode === "advanced";
+    return {
+      trade: trades[currentTrade],
+      advanced,
+      requirements: buildRecipeRequirements(advanced),
+      fusionIcon: advanced ? ICON_ADVANCED : ICON_NORMAL,
+      costPer10: advanced
+        ? (parseFloat(document.getElementById("goldAdvanced").value) || 0)
+        : (parseFloat(document.getElementById("goldNormal").value) || 0),
+      sellPricePerOne: advanced
+        ? (parseFloat(document.getElementById("saleAdvanced").value) || 0)
+        : (parseFloat(document.getElementById("saleNormal").value) || 0),
+      marketPrices: {
+        base: parseFloat(document.getElementById("materialBasePrice").value) || 0,
+        powder: parseFloat(document.getElementById("materialPowderPrice").value) || 0,
+        tender: parseFloat(document.getElementById("materialTenderPrice").value) || 0,
+        sturdy: parseFloat(document.getElementById("materialSturdyPrice").value) || 0,
+        abidos: parseFloat(document.getElementById("materialAbidosPrice").value) || 0
+      }
+    };
+  }
+
+  function savePlannerState() {
+    localStorage.setItem(BUY_PLANNER_STORAGE_KEY, JSON.stringify({
+      targetFusionCount: document.getElementById("targetFusionCount").value || ""
+    }));
+  }
+
+  function loadPlannerState() {
+    try {
+      const plannerState = JSON.parse(localStorage.getItem(BUY_PLANNER_STORAGE_KEY) || "{}");
+      document.getElementById("targetFusionCount").value = plannerState.targetFusionCount || "";
+    } catch {
+      document.getElementById("targetFusionCount").value = "";
+    }
+  }
+
+  function renderMarketPlanner() {
+    const output = document.getElementById("marketPlannerOutput");
+    if (!output) {
+      return;
+    }
+
+    const context = getCurrentPricingContext();
+    const { trade, advanced, requirements, fusionIcon, costPer10, sellPricePerOne, marketPrices } = context;
+    const actionEnergyPer10 = getActionEnergyPerTen(advanced);
+    const targetFusionCount = Math.max(0, Math.floor(parseInt(document.getElementById("targetFusionCount").value || "0", 10) || 0));
+    const plannerModeLabel = requirements.modeLabel;
+    const plannerShortLabel = advanced ? "Advanced Abidos" : "Abidos";
+
+    document.getElementById("plannerModeBadge").textContent = plannerModeLabel;
+    document.getElementById("plannerFusionIcon").src = fusionIcon;
+    document.getElementById("plannerFusionIcon").alt = plannerModeLabel;
+    document.getElementById("plannerTradeValue").textContent = trade.label;
+    document.getElementById("plannerFusionPriceLabel").textContent = `Market buy price per 1x ${plannerModeLabel}`;
+    document.getElementById("plannerFusionPriceValue").textContent = sellPricePerOne > 0
+      ? `${formatGoldValue(sellPricePerOne)} Gold`
+      : "Missing";
+    document.getElementById("plannerCraftCostLabel").textContent = `Craft fee per 10x ${plannerShortLabel}`;
+    document.getElementById("plannerCraftCostValue").textContent = costPer10 > 0
+      ? `${formatGoldValue(costPer10)} Gold`
+      : "Missing";
+    document.getElementById("plannerEnergyValue").textContent = `${actionEnergyPer10.toLocaleString()} energy`;
+    document.getElementById("plannerBatchNote").textContent = `${advanced ? "Advanced Abidos" : "Abidos"} crafts in 10x batches. The planner rounds up to the next batch when your target is not divisible by 10.`;
+
+    if (!(targetFusionCount > 0)) {
+      output.innerHTML = `
+        <div class="planner-empty">
+          Enter a fusion target to see the total craft recipe, total action energy, and whether buying raw mats to craft or buying fusion directly is cheaper.
+        </div>
+      `;
+      return;
+    }
+
+    const comparison = getBuyVsCraftComparison(
+      trade,
+      requirements,
+      marketPrices,
+      costPer10,
+      sellPricePerOne,
+      targetFusionCount
+    );
+    const craftBatches = Math.ceil(targetFusionCount / 10);
+    const craftOutput = craftBatches * 10;
+    const extraFusion = craftOutput - targetFusionCount;
+    const totalActionEnergy = craftBatches * actionEnergyPer10;
+    const materials = {
+      base: requirements.base * craftBatches,
+      tender: requirements.tender * craftBatches,
+      abidos: requirements.abidos * craftBatches
+    };
+
+    let recommendationCard = `
+      <div class="gold-total-box">
+        <div class="gold-total-title">
+          <img src="${fusionIcon}" alt="Planner">
+          Buy Mats vs Buy Fusion
+        </div>
+        <div class="comparison-value">Pricing Needed</div>
+        <div class="comparison-sub">Fill the fusion market price, craft fee, and raw material prices in Pricing Settings to compare both market routes.</div>
+      </div>
+    `;
+
+    if (comparison) {
+      const betterOption = comparison.projectedDifference > 0
+        ? "Buy Raw Mats + Craft"
+        : comparison.projectedDifference < 0
+          ? "Buy Fusion Directly"
+          : "Either Option";
+      const summary = comparison.projectedDifference > 0
+        ? `Crafting saves ${formatGoldValue(Math.abs(comparison.projectedDifference))} Gold for this target.`
+        : comparison.projectedDifference < 0
+          ? `Buying fusion directly saves ${formatGoldValue(Math.abs(comparison.projectedDifference))} Gold for this target.`
+          : "Both routes cost the same for this target.";
+      const extraCopy = extraFusion > 0
+        ? `Crafting rounds up to ${craftOutput.toLocaleString()} fusion, leaving ${extraFusion.toLocaleString()} extra.`
+        : `Crafting lands exactly on ${craftOutput.toLocaleString()} fusion.`;
+
+      recommendationCard = `
+        <div class="gold-total-box">
+          <div class="gold-total-title">
+            <img src="${comparison.projectedDifference >= 0 ? trade.icons.trade : fusionIcon}" alt="Planner Result">
+            Buy Mats vs Buy Fusion
+          </div>
+          <div class="comparison-value">${betterOption}</div>
+          <div class="comparison-sub">${summary}</div>
+          <div class="comparison-sub">${extraCopy}</div>
+          <div class="planner-summary-grid">
+            <div class="planner-summary-chip">
+              <span>Buy Mats + Craft</span>
+              <strong>${formatGoldValue(comparison.projectedCraftCost)} Gold</strong>
+            </div>
+            <div class="planner-summary-chip">
+              <span>Buy Fusion Direct</span>
+              <strong>${formatGoldValue(comparison.projectedDirectCost)} Gold</strong>
+            </div>
+            <div class="planner-summary-chip">
+              <span>Raw Mats Total</span>
+              <strong>${formatGoldValue(comparison.rawMatCostTotal)} Gold</strong>
+            </div>
+            <div class="planner-summary-chip">
+              <span>Craft Fees Total</span>
+              <strong>${formatGoldValue(comparison.totalCraftFee)} Gold</strong>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    const sourcesHtml = comparison
+      ? `
+        <div class="planner-source-list">
+          <div class="planner-source-row">
+            <span>${trade.base}</span>
+            <strong>${comparison.effectiveSources.base || "No market price"}</strong>
+          </div>
+          <div class="planner-source-row">
+            <span>${trade.tender}</span>
+            <strong>${comparison.effectiveSources.tender || "No market price"}</strong>
+          </div>
+          <div class="planner-source-row">
+            <span>${trade.abidos}</span>
+            <strong>${comparison.effectiveSources.abidos || "No market price"}</strong>
+          </div>
+        </div>
+      `
+      : `
+        <div class="comparison-sub">Add the base, tender, and abidos material prices in Pricing Settings so the planner can calculate the cheapest raw-mat path.</div>
+      `;
+
+    output.innerHTML = `
+      ${recommendationCard}
+      <div class="gold-total-box">
+        <div class="gold-total-title">
+          <img src="${GOLD_ICON}" alt="Action Energy">
+          Craft Plan
+        </div>
+        <div class="comparison-value">${craftBatches.toLocaleString()} batch${craftBatches === 1 ? "" : "es"}</div>
+        <div class="comparison-sub">Requested ${targetFusionCount.toLocaleString()} fusion • Craft output ${craftOutput.toLocaleString()} fusion</div>
+        <div class="comparison-sub">Action energy required: ${totalActionEnergy.toLocaleString()} total (${actionEnergyPer10.toLocaleString()} per 10x)</div>
+      </div>
+      <div class="gold-total-box">
+        <div class="gold-total-title">
+          <img src="${trade.icons.trade}" alt="Required Materials">
+          Required Craft Materials
+        </div>
+        <div class="planner-material-list">
+          <div class="planner-material-row">
+            <span>${trade.base}</span>
+            <strong>${materials.base.toLocaleString()}</strong>
+          </div>
+          <div class="planner-material-row">
+            <span>${trade.tender}</span>
+            <strong>${materials.tender.toLocaleString()}</strong>
+          </div>
+          <div class="planner-material-row">
+            <span>${trade.abidos}</span>
+            <strong>${materials.abidos.toLocaleString()}</strong>
+          </div>
+        </div>
+      </div>
+      <div class="gold-total-box">
+        <div class="gold-total-title">
+          <img src="${trade.icons.trade}" alt="Cheapest Material Path">
+          Cheapest Raw-Mat Path
+        </div>
+        <div class="comparison-sub">The planner uses the cheapest effective market path per material, including supported conversions where they beat buying the recipe mat directly.</div>
+        ${sourcesHtml}
+      </div>
+    `;
   }
 
   function runCalc() {
@@ -2003,20 +2507,6 @@
       ((tender / 100) * materialTenderPrice) +
       ((sturdy / 100) * materialSturdyPrice) +
       ((abidos / 100) * materialAbidosPrice);
-    const buyVsCraft = getBuyVsCraftComparison(
-      trade,
-      requirements,
-      {
-        base: materialBasePrice,
-        powder: materialPowderPrice,
-        tender: materialTenderPrice,
-        sturdy: materialSturdyPrice,
-        abidos: materialAbidosPrice
-      },
-      costPer10,
-      sellPricePerOne,
-      data.fusionMaterial
-    );
 
     let stepZero = "";
     if (trade.useSturdy && data.sturdyToBaseTimes > 0) {
@@ -2113,37 +2603,6 @@
       `;
     }
 
-    let marketBuyVsCraftHtml = "";
-    if (buyVsCraft) {
-      const betterOption = buyVsCraft.perTenDifference > 0
-        ? "Buy Raw Mats + Craft"
-        : buyVsCraft.perTenDifference < 0
-          ? "Buy Fusion Directly"
-          : "Either Option";
-      const perTenSummary = buyVsCraft.perTenDifference > 0
-        ? `Crafting from bought mats saves ${formatGoldValue(Math.abs(buyVsCraft.perTenDifference))} Gold per 10x`
-        : buyVsCraft.perTenDifference < 0
-          ? `Buying fusion directly saves ${formatGoldValue(Math.abs(buyVsCraft.perTenDifference))} Gold per 10x`
-          : "Buying mats and buying fusion cost the same per 10x";
-      const projectedSummary = buyVsCraft.projectedCycles > 0
-        ? `For ${data.fusionMaterial.toLocaleString()} fusion: ${formatGoldValue(Math.abs(buyVsCraft.projectedDifference))} Gold ${buyVsCraft.projectedDifference > 0 ? "saved by crafting" : buyVsCraft.projectedDifference < 0 ? "saved by buying direct" : "difference"}`
-        : "Enter owned mats to see the same comparison scaled to your current output quantity.";
-
-      marketBuyVsCraftHtml = `
-        <div class="gold-total-box">
-          <div class="gold-total-title">
-            <img src="${buyVsCraft.perTenDifference >= 0 ? trade.icons.trade : fusionIcon}" alt="Buy vs Craft">
-            Buy Mats vs Buy Fusion
-          </div>
-          <div class="comparison-value">${betterOption}</div>
-          <div class="comparison-sub">${perTenSummary}</div>
-          <div class="comparison-sub">Raw mats per 10x: ${formatGoldValue(buyVsCraft.rawMatCostPer10)} Gold • Craft fee per 10x: ${formatGoldValue(costPer10)} Gold</div>
-          <div class="comparison-sub">Buy mats + craft per 10x: ${formatGoldValue(buyVsCraft.buyAndCraftCostPer10)} Gold • Buy fusion direct per 10x: ${formatGoldValue(buyVsCraft.directFusionCostPer10)} Gold</div>
-          <div class="comparison-sub">${projectedSummary}</div>
-        </div>
-      `;
-    }
-
     const output = document.getElementById("output");
     output.style.display = "grid";
     output.innerHTML = `
@@ -2202,7 +2661,6 @@
       ${saleHtml}
       ${netCraftHtml}
       ${rawMaterialHtml}
-      ${marketBuyVsCraftHtml}
       ${comparisonHtml}
     `;
   }
@@ -2230,9 +2688,14 @@
   document.getElementById("tenderInput").addEventListener("input", saveCurrentInputs);
   document.getElementById("sturdyInput").addEventListener("input", saveCurrentInputs);
   document.getElementById("abidosInput").addEventListener("input", saveCurrentInputs);
+  document.getElementById("targetFusionCount").addEventListener("input", () => {
+    savePlannerState();
+    renderMarketPlanner();
+  });
 
   loadUiState();
   loadMarketUiState();
+  loadPlannerState();
   createParticles();
   renderTradeButtons();
   setupModeButtons();
@@ -2240,6 +2703,7 @@
   updateTradeUI();
   loadGold();
   refreshMarketSyncSummary();
+  renderMarketPlanner();
 </script>
 </body>
 </html>
